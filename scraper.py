@@ -58,3 +58,25 @@ if deals:
     with open("alerts.txt", "w") as f:
         f.write("\n".join(deals))
 
+# --- DEAL ALERT LOGIC ---
+deals = []
+for item in listings:
+    try:
+        # Targeting the resort and price
+        resort_element = item.find('a', class_='listings-table__listing-resort')
+        resort = resort_element.get_text(strip=True)
+        
+        price_text = item.find('td', {'data-column': 'price-per-point'}).get_text(strip=True)
+        price = float(price_text.replace('$', ''))
+        
+        # ALERT CRITERIA: Change these to your liking!
+        if ("AnimalKingdom" in resort and price < 115) or ("Saratoga" in resort and price < 100):
+            deals.append(f"🚨 {resort} DEAL: ${price}/pt (ID: {resort_element['href'].split('/')[-2]})")
+    except:
+        continue
+
+# If deals are found, save them to a file for GitHub Actions to see
+if deals:
+    with open("alerts.txt", "w") as f:
+        f.write("\n".join(deals))
+    print(f"Alert triggered! Found {len(deals)} deals.")
