@@ -24,6 +24,7 @@ jobs:
         run: pip install requests beautifulsoup4
 
       - name: Run Scraper
+        id: run_scraper
         run: python scraper.py
 
       - name: Save results
@@ -33,3 +34,18 @@ jobs:
           git add data/listings_history.csv
           git commit -m "Automated daily price update" || echo "No changes to commit"
           git push
+
+      - name: Send Email Alert
+        if: hashFiles('alerts.txt') != ''
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: smtp.gmail.com
+          server_port: 465
+          # Note: You will need to set up these secrets in your repo settings
+          username: ${{secrets.EMAIL_USERNAME}} 
+          password: ${{secrets.EMAIL_PASSWORD}}
+          subject: 🚨 DVC Deal Detected!
+          body: |
+            New deals found on DVC Resale Market! Check your dashboard for details.
+          to: ${{secrets.MY_EMAIL}}
+          from: DVC Price Observer
