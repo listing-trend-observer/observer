@@ -1,0 +1,37 @@
+name: Daily Price Scraper
+
+# This is the "Alarm Clock" part
+on:
+  schedule:
+    - cron: '0 2 * * *'  # This tells it to run every night at 2:00 AM UTC
+  workflow_dispatch:      # This allows YOU to run it manually with a button click
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    # These permissions allow the cloud computer to "write" to your private repo
+    permissions:
+      contents: write
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.10'
+
+    - name: Install "Tools" for the Robot
+      run: pip install requests beautifulsoup4
+
+    - name: Run the Scraper
+      run: python scraper.py
+
+    - name: Save the results
+      run: |
+        git config --global user.name 'GitHub Action'
+        git config --global user.email 'action@github.com'
+        git add data/listings_history.csv
+        git commit -m "Automated daily price update" || echo "No changes to commit"
+        git push
