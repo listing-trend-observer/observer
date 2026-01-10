@@ -1,1 +1,0 @@
-date,resort,points,price_per_point,total_price,status
