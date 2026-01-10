@@ -15,7 +15,25 @@
         table { width: 100%; border-collapse: collapse; margin-top: 10px; }
         th, td { padding: 12px; text-align: left; border-bottom: 1px solid #eee; }
         th { background: #f1f3f4; font-weight: 600; }
+        tr:hover { background: #fafafa; }
+        
+        /* Insight Badges */
         .badge-new { background: #e8f0fe; color: #1967d2; padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: bold; }
+        .badge-drop { 
+            background: #fce8e6; 
+            color: #d93025; 
+            padding: 4px 8px; 
+            border-radius: 4px; 
+            font-size: 11px; 
+            font-weight: bold; 
+            border: 1px solid #d93025;
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.7; }
+            100% { opacity: 1; }
+        }
     </style>
 </head>
 <body>
@@ -24,7 +42,7 @@
 
         <div class="card" style="margin-bottom: 20px; display: flex; align-items: center; gap: 15px;">
             <label for="resortFilter" style="font-weight: bold;">Filter by Resort:</label>
-            <select id="resortFilter" style="padding: 8px; border-radius: 6px; border: 1px solid #ccc; flex-grow: 1;">
+            <select id="resortFilter" style="padding: 10px; border-radius: 6px; border: 1px solid #ccc; flex-grow: 1; font-size: 16px;">
                 <option value="All">All Resorts (Market Overview)</option>
             </select>
         </div>
@@ -41,10 +59,16 @@
         </div>
 
         <div class="card">
-            <h2>Live Market Feed</h2>
+            <h2 id="tableTitle">Live Market Feed</h2>
             <table>
                 <thead>
-                    <tr><th>Resort</th><th>Points</th><th>Price/Pt</th><th>Days on Market</th><th>Insight</th></tr>
+                    <tr>
+                        <th>Resort</th>
+                        <th>Points</th>
+                        <th>Price/Pt</th>
+                        <th>Days on Market</th>
+                        <th>Status / Insight</th>
+                    </tr>
                 </thead>
                 <tbody id="listingBody"></tbody>
             </table>
@@ -55,11 +79,12 @@
         let fullData = [];
         let inventoryChart, priceDistChart;
 
-        // Use './' to ensure GitHub Pages finds the file relative to the index.html
+        // Load Data from CSV
         Papa.parse('./data/listings_history.csv', {
-            download: true, header: true,
+            download: true, 
+            header: true,
             complete: function(results) {
-                fullData = results.data.filter(d => d.date);
+                fullData = results.data.filter(d => d.date && d.listing_id);
                 if(fullData.length > 0) {
                     setupFilter(fullData);
                     updateDashboard("All");
@@ -83,22 +108,24 @@
             const latestDate = dates[dates.length - 1];
             const prevDate = dates[dates.length - 2] || latestDate;
 
+            // Filter context
             const filteredData = selectedResort === "All" ? fullData : fullData.filter(d => d.resort === selectedResort);
             const latestListings = filteredData.filter(d => d.date === latestDate);
             const prevListings = filteredData.filter(d => d.date === prevDate);
 
-            // Metrics
+            // 1. Update Metrics
             document.getElementById('totalListings').innerText = latestListings.length;
             const avg = latestListings.reduce((s, c) => s + parseFloat(c.price_per_point.replace('$','')), 0) / (latestListings.length || 1);
             document.getElementById('avgPrice').innerText = `$${avg.toFixed(2)}`;
 
-            // Sold Logic
+            // 2. Sold Logic (Present yesterday, gone today)
             const latestIDs = new Set(latestListings.map(l => l.listing_id));
             const solds = prevListings.filter(l => !latestIDs.has(l.listing_id));
             document.getElementById('soldCount').innerText = solds.length;
 
+            // 3. Refresh Charts & Table
             updateCharts(filteredData, dates, selectedResort, latestListings);
-            updateTable(latestListings);
+            updateTable(latestListings, prevListings, latestDate);
         }
 
         function updateCharts(data, dates, selectedResort, latestListings) {
@@ -117,7 +144,7 @@
                         tension: 0.3
                     }))
                 },
-                options: { maintainAspectRatio: false, plugins: { title: { display: true, text: 'Inventory Trend' } } }
+                options: { maintainAspectRatio: false, plugins: { title: { display: true, text: 'Inventory Volume Trend' } } }
             });
 
             const prices = latestListings.map(l => parseFloat(l.price_per_point.replace('$','')));
@@ -126,7 +153,7 @@
                 data: {
                     labels: ['<$100', '$100-120', '$120-140', '$140-160', '>$160'],
                     datasets: [{
-                        label: 'Listings',
+                        label: 'Listing Volume',
                         data: [
                             prices.filter(p => p < 100).length,
                             prices.filter(p => p >= 100 && p < 120).length,
@@ -134,24 +161,45 @@
                             prices.filter(p => p >= 140 && p < 160).length,
                             prices.filter(p => p >= 160).length,
                         ],
-                        backgroundColor: '#1a73e8'
+                        backgroundColor: '#34a853'
                     }]
                 },
-                options: { maintainAspectRatio: false }
+                options: { maintainAspectRatio: false, plugins: { title: { display: true, text: 'Price Point Distribution' } } }
             });
         }
 
-        function updateTable(listings) {
+        function updateTable(listings, prevListings, latestDate) {
             const tableBody = document.getElementById('listingBody');
             tableBody.innerHTML = "";
-            listings.slice(0, 20).forEach(item => {
-                const daysOnMarket = fullData.filter(d => d.listing_id === item.listing_id).length;
+            
+            listings.sort((a,b) => parseFloat(a.price_per_point.replace('$','')) - parseFloat(b.price_per_point.replace('$','')));
+
+            listings.slice(0, 50).forEach(item => {
+                // Days on Market Calculation
+                const history = fullData.filter(d => d.listing_id === item.listing_id);
+                const daysOnMarket = history.length;
+                
+                // Price Drop Calculation
+                let statusHtml = '';
+                const yesterdayEntry = prevListings.find(p => p.listing_id === item.listing_id);
+                
+                if (daysOnMarket === 1) {
+                    statusHtml = '<span class="badge-new">NEW LISTING</span>';
+                } else if (yesterdayEntry) {
+                    const currentPrice = parseFloat(item.price_per_point.replace('$',''));
+                    const oldPrice = parseFloat(yesterdayEntry.price_per_point.replace('$',''));
+                    if (currentPrice < oldPrice) {
+                        const drop = (oldPrice - currentPrice).toFixed(2);
+                        statusHtml = `<span class="badge-drop">📉 DROP: -$${drop}</span>`;
+                    }
+                }
+
                 tableBody.innerHTML += `<tr>
                     <td>${item.resort}</td>
                     <td>${item.points}</td>
                     <td>${item.price_per_point}</td>
                     <td>${daysOnMarket} Day(s)</td>
-                    <td>${daysOnMarket === 1 ? '<span class="badge-new">NEW</span>' : ''}</td>
+                    <td>${statusHtml}</td>
                 </tr>`;
             });
         }
