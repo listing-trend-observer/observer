@@ -1,1 +1,363 @@
 date,listing_id,resort,points,price_per_point
+2026-01-10,ak85326,AnimalKingdom,160,$112
+2026-01-10,aka5820,AnimalKingdom,250,$104
+2026-01-10,akb5869,AnimalKingdom,200,$111
+2026-01-10,akb5871,AnimalKingdom,200,$111
+2026-01-10,ak55884,AnimalKingdom,180,$107
+2026-01-10,akc5903,AnimalKingdom,120,$135
+2026-01-10,ak65276,AnimalKingdom,250,$109
+2026-01-10,akf5897,AnimalKingdom,240,$114
+2026-01-10,ak35924,AnimalKingdom,220,$103
+2026-01-10,ak25939,AnimalKingdom,160,$116
+2026-01-10,aka5923,AnimalKingdom,150,$106
+2026-01-10,ak55936,AnimalKingdom,120,$112
+2026-01-10,ak25941,AnimalKingdom,100,$114
+2026-01-10,ak25942,AnimalKingdom,360,$99
+2026-01-10,aka5943,AnimalKingdom,240,$105
+2026-01-10,ak95935,AnimalKingdom,300,$125
+2026-01-10,ak85951,AnimalKingdom,100,$114
+2026-01-10,ak35946,AnimalKingdom,100,$119
+2026-01-10,akf5954,AnimalKingdom,250,$115
+2026-01-10,ak35938,AnimalKingdom,270,$123
+2026-01-10,akf5961,AnimalKingdom,160,$106
+2026-01-10,ak25964,AnimalKingdom,120,$108
+2026-01-10,ak85948,AnimalKingdom,160,$108
+2026-01-10,akb5965,AnimalKingdom,100,$110
+2026-01-10,akb5966,AnimalKingdom,100,$110
+2026-01-10,akf5507,AnimalKingdom,200,$97
+2026-01-10,ak55378,AnimalKingdom,150,$102
+2026-01-10,akg5968,AnimalKingdom,100,$108
+2026-01-10,ak55971,AnimalKingdom,160,$106
+2026-01-10,aka5958,AnimalKingdom,75,$130
+2026-01-10,akb5976,AnimalKingdom,200,$115
+2026-01-10,akb5967,AnimalKingdom,55,$110
+2026-01-10,ak75962,AnimalKingdom,160,$118
+2026-01-10,ak95960,AnimalKingdom,120,$120
+2026-01-10,akb5978,AnimalKingdom,160,$108
+2026-01-10,ak35973,AnimalKingdom,160,$115
+2026-01-10,ak35970,AnimalKingdom,165,$110
+2026-01-10,ak35984,AnimalKingdom,130,$103
+2026-01-10,aua3210,Aulani,270,$88
+2026-01-10,au52937,Aulani,100,$127
+2026-01-10,au53037,Aulani,150,$108
+2026-01-10,au53092,Aulani,250,$108
+2026-01-10,au33109,Aulani,160,$102
+2026-01-10,au32983,Aulani,110,$100
+2026-01-10,au53142,Aulani,200,$110
+2026-01-10,au63146,Aulani,200,$95
+2026-01-10,auc3151,Aulani,220,$102
+2026-01-10,au93138,Aulani,110,$110
+2026-01-10,aub1945,Aulani,135,$96
+2026-01-10,au93181,Aulani,200,$102
+2026-01-10,au23194,Aulani,150,$106
+2026-01-10,aue3147,Aulani,300,$91
+2026-01-10,auf3100,Aulani,175,$92
+2026-01-10,au93200,Aulani,100,$111
+2026-01-10,au33201,Aulani,200,$95
+2026-01-10,aug3193,Aulani,175,$99
+2026-01-10,aug3042,Aulani,100,$106
+2026-01-10,au53206,Aulani,50,$113
+2026-01-10,aua3191,Aulani,230,$89
+2026-01-10,bl53376,Bay LakeTower,160,$145
+2026-01-10,bl63382,Bay LakeTower,100,$148
+2026-01-10,bla3398,Bay LakeTower,270,$135
+2026-01-10,blf3400,Bay LakeTower,180,$133
+2026-01-10,bla3404,Bay LakeTower,75,$150
+2026-01-10,bla3402,Bay LakeTower,75,$150
+2026-01-10,bl53422,Bay LakeTower,125,$142
+2026-01-10,bl63409,Bay LakeTower,160,$142
+2026-01-10,bl23433,Bay LakeTower,200,$144
+2026-01-10,bld3183,Bay LakeTower,200,$140
+2026-01-10,bl23435,Bay LakeTower,200,$138
+2026-01-10,bla3432,Bay LakeTower,210,$143
+2026-01-10,bl23437,Bay LakeTower,160,$137
+2026-01-10,bld3438,Bay LakeTower,75,$145
+2026-01-10,bld3436,Bay LakeTower,100,$144
+2026-01-10,bl23449,Bay LakeTower,270,$131
+2026-01-10,bl23451,Bay LakeTower,100,$145
+2026-01-10,bl33443,Bay LakeTower,160,$140
+2026-01-10,bl33447,Bay LakeTower,200,$135
+2026-01-10,ble3454,Bay LakeTower,100,$142
+2026-01-10,bla3458,Bay LakeTower,150,$134
+2026-01-10,bla3453,Bay LakeTower,100,$139
+2026-01-10,bl23459,Bay LakeTower,25,$163
+2026-01-10,bl23460,Bay LakeTower,30,$163
+2026-01-10,blc3429,Bay LakeTower,25,$150
+2026-01-10,bl33456,Bay LakeTower,165,$135
+2026-01-10,blf3465,Bay LakeTower,300,$147
+2026-01-10,bla3466,Bay LakeTower,120,$153
+2026-01-10,bla3467,Bay LakeTower,120,$155
+2026-01-10,bla3468,Bay LakeTower,120,$155
+2026-01-10,bl53469,Bay LakeTower,75,$144
+2026-01-10,bl93470,Bay LakeTower,80,$150
+2026-01-10,bc82303,BeachClub,150,$136
+2026-01-10,bcc2371,BeachClub,300,$140
+2026-01-10,bce2313,BeachClub,210,$137
+2026-01-10,bce2386,BeachClub,120,$128
+2026-01-10,bca2381,BeachClub,75,$155
+2026-01-10,bce2385,BeachClub,150,$142
+2026-01-10,bc62389,BeachClub,200,$133
+2026-01-10,bca2380,BeachClub,160,$148
+2026-01-10,bc32390,BeachClub,75,$132
+2026-01-10,bca2391,BeachClub,160,$144
+2026-01-10,bcb2383,BeachClub,150,$135
+2026-01-10,bcb2384,BeachClub,50,$139
+2026-01-10,bcf2394,BeachClub,200,$137
+2026-01-10,bw13157,Boardwalk,50,$149
+2026-01-10,bwa3047,Boardwalk,200,$114
+2026-01-10,bwa3118,Boardwalk,150,$124
+2026-01-10,bwg3114,Boardwalk,150,$124
+2026-01-10,bwg3116,Boardwalk,100,$135
+2026-01-10,bw23122,Boardwalk,500,$113
+2026-01-10,bw83125,Boardwalk,240,$119
+2026-01-10,bw23120,Boardwalk,175,$122
+2026-01-10,bwg2835,Boardwalk,150,$133
+2026-01-10,bw53123,Boardwalk,150,$118
+2026-01-10,bw23131,Boardwalk,500,$110
+2026-01-10,bw23132,Boardwalk,300,$117
+2026-01-10,bw93073,Boardwalk,150,$124
+2026-01-10,bw93135,Boardwalk,150,$128
+2026-01-10,bwf3136,Boardwalk,390,$117
+2026-01-10,bw53109,Boardwalk,150,$132
+2026-01-10,bwa3137,Boardwalk,150,$148
+2026-01-10,bwa3044,Boardwalk,60,$139
+2026-01-10,bw73128,Boardwalk,200,$138
+2026-01-10,bw73129,Boardwalk,25,$150
+2026-01-10,bw73141,Boardwalk,300,$115
+2026-01-10,bw83142,Boardwalk,50,$156
+2026-01-10,bw73145,Boardwalk,174,$122
+2026-01-10,bw33155,Boardwalk,25,$129
+2026-01-10,br51768,BoulderRidge,200,$102
+2026-01-10,bra1443,BoulderRidge,180,$107
+2026-01-10,br61811,BoulderRidge,270,$100
+2026-01-10,brb1669,BoulderRidge,200,$95
+2026-01-10,br71814,BoulderRidge,150,$94
+2026-01-10,br51816,BoulderRidge,230,$102
+2026-01-10,brb1819,BoulderRidge,50,$112
+2026-01-10,brf1821,BoulderRidge,170,$103
+2026-01-10,brb1822,BoulderRidge,450,$95
+2026-01-10,br61823,BoulderRidge,200,$101
+2026-01-10,br21826,BoulderRidge,250,$100
+2026-01-10,brb1825,BoulderRidge,200,$85
+2026-01-10,brd1828,BoulderRidge,50,$111
+2026-01-10,br31829,BoulderRidge,50,$124
+2026-01-10,ccb2755,CopperCreek,150,$138
+2026-01-10,cce2771,CopperCreek,50,$144
+2026-01-10,ccb2777,CopperCreek,175,$143
+2026-01-10,cca2779,CopperCreek,200,$137
+2026-01-10,cc32774,CopperCreek,250,$130
+2026-01-10,ccd2780,CopperCreek,100,$146
+2026-01-10,ccb2787,CopperCreek,150,$138
+2026-01-10,cc52747,CopperCreek,250,$128
+2026-01-10,cc52737,CopperCreek,250,$128
+2026-01-10,cc22791,CopperCreek,150,$135
+2026-01-10,cce2801,CopperCreek,100,$150
+2026-01-10,cce2802,CopperCreek,175,$145
+2026-01-10,cc62793,CopperCreek,60,$160
+2026-01-10,ccc2662,CopperCreek,175,$131
+2026-01-10,cca2805,CopperCreek,100,$151
+2026-01-10,cc82810,CopperCreek,150,$135
+2026-01-10,cc82816,CopperCreek,100,$155
+2026-01-10,ccc2817,CopperCreek,75,$148
+2026-01-10,dhf1055,DisneylandHotel,180,$180
+2026-01-10,dhg1069,DisneylandHotel,200,$180
+2026-01-10,dha1076,DisneylandHotel,60,$160
+2026-01-10,dh81087,DisneylandHotel,50,$180
+2026-01-10,gc31755,GrandCalifornian,160,$262
+2026-01-10,gc81763,GrandCalifornian,160,$257
+2026-01-10,gc81766,GrandCalifornian,200,$255
+2026-01-10,gcb1764,GrandCalifornian,125,$259
+2026-01-10,gc21768,GrandCalifornian,210,$248
+2026-01-10,gce1618,GrandCalifornian,160,$262
+2026-01-10,gc61771,GrandCalifornian,150,$260
+2026-01-10,gf92590,GrandFloridian,138,$159
+2026-01-10,gf32830,GrandFloridian,100,$165
+2026-01-10,gfe2890,GrandFloridian,50,$165
+2026-01-10,gff2957,GrandFloridian,50,$173
+2026-01-10,gf72986,GrandFloridian,130,$158
+2026-01-10,gf32867,GrandFloridian,100,$158
+2026-01-10,gfa2999,GrandFloridian,160,$164
+2026-01-10,gf63027,GrandFloridian,180,$160
+2026-01-10,gfa3039,GrandFloridian,100,$155
+2026-01-10,gfa3038,GrandFloridian,100,$155
+2026-01-10,gfa3059,GrandFloridian,70,$164
+2026-01-10,gfb3054,GrandFloridian,60,$170
+2026-01-10,gfa3069,GrandFloridian,100,$159
+2026-01-10,gfg3067,GrandFloridian,100,$161
+2026-01-10,gf33074,GrandFloridian,150,$152
+2026-01-10,gfe3078,GrandFloridian,175,$160
+2026-01-10,gf23081,GrandFloridian,200,$148
+2026-01-10,gfa3084,GrandFloridian,150,$136
+2026-01-10,gfa3088,GrandFloridian,90,$180
+2026-01-10,gfb2854,GrandFloridian,150,$160
+2026-01-10,gfb2855,GrandFloridian,50,$169
+2026-01-10,gfb3094,GrandFloridian,250,$161
+2026-01-10,gfb3101,GrandFloridian,200,$150
+2026-01-10,gf53104,GrandFloridian,100,$164
+2026-01-10,gf33096,GrandFloridian,200,$138
+2026-01-10,gfb3098,GrandFloridian,125,$160
+2026-01-10,gfb2819,GrandFloridian,150,$160
+2026-01-10,hhc1700,HiltonHead,210,$65
+2026-01-10,hhg1671,HiltonHead,230,$64
+2026-01-10,hhe1672,HiltonHead,200,$73
+2026-01-10,hhc1668,HiltonHead,30,$77
+2026-01-10,hhe1697,HiltonHead,350,$76
+2026-01-10,hh91698,HiltonHead,30,$79
+2026-01-10,hh71699,HiltonHead,160,$65
+2026-01-10,hhb1703,HiltonHead,200,$59
+2026-01-10,hhb1705,HiltonHead,230,$59
+2026-01-10,hh71702,HiltonHead,100,$77
+2026-01-10,hhb1560,HiltonHead,200,$55
+2026-01-10,hhb1561,HiltonHead,50,$75
+2026-01-10,hhb1562,HiltonHead,160,$60
+2026-01-10,hhb1704,HiltonHead,25,$77
+2026-01-10,hh51708,HiltonHead,50,$82
+2026-01-10,oka4588,Old KeyWest,190,$99
+2026-01-10,ok24662,Old KeyWest,50,$122
+2026-01-10,ok24681,Old KeyWest,50,$107
+2026-01-10,okg4476,Old KeyWest,150,$86
+2026-01-10,oka4553,Old KeyWest,180,$107
+2026-01-10,okb4567,Old KeyWest,560,$80
+2026-01-10,ok84593,Old KeyWest,170,$87
+2026-01-10,ok64619,Old KeyWest,270,$92
+2026-01-10,ok64622,Old KeyWest,60,$103
+2026-01-10,okb4604,Old KeyWest,180,$91
+2026-01-10,okg4626,Old KeyWest,230,$93
+2026-01-10,oka4630,Old KeyWest,32,$125
+2026-01-10,ok94633,Old KeyWest,220,$88
+2026-01-10,ok24638,Old KeyWest,100,$84
+2026-01-10,ok24640,Old KeyWest,310,$84
+2026-01-10,ok24643,Old KeyWest,150,$86
+2026-01-10,ok24644,Old KeyWest,230,$85
+2026-01-10,ok34642,Old KeyWest,230,$84
+2026-01-10,oke4612,Old KeyWest,150,$100
+2026-01-10,ok24647,Old KeyWest,220,$90
+2026-01-10,ok24650,Old KeyWest,300,$83
+2026-01-10,ok64606,Old KeyWest,190,$88
+2026-01-10,oke4652,Old KeyWest,270,$100
+2026-01-10,oke4649,Old KeyWest,230,$95
+2026-01-10,ok54655,Old KeyWest,250,$81
+2026-01-10,okd4615,Old KeyWest,150,$102
+2026-01-10,okd4616,Old KeyWest,60,$123
+2026-01-10,okf4628,Old KeyWest,150,$116
+2026-01-10,okf4627,Old KeyWest,100,$121
+2026-01-10,okf3847,Old KeyWest,210,$102
+2026-01-10,ok74659,Old KeyWest,175,$105
+2026-01-10,okb4637,Old KeyWest,250,$92
+2026-01-10,ok94665,Old KeyWest,78,$123
+2026-01-10,ok94670,Old KeyWest,58,$127
+2026-01-10,ok94654,Old KeyWest,50,$112
+2026-01-10,oka4674,Old KeyWest,100,$95
+2026-01-10,okb4675,Old KeyWest,210,$81
+2026-01-10,ok54669,Old KeyWest,310,$86
+2026-01-10,okb3736,Old KeyWest,210,$86
+2026-01-10,ok94676,Old KeyWest,80,$99
+2026-01-10,okf4509,Old KeyWest,140,$89
+2026-01-10,okf4507,Old KeyWest,210,$95
+2026-01-10,okb4679,Old KeyWest,100,$110
+2026-01-10,ok74672,Old KeyWest,230,$88
+2026-01-10,ok74673,Old KeyWest,50,$105
+2026-01-10,plf4295,Polynesian,110,$186
+2026-01-10,pld4149,Polynesian,200,$179
+2026-01-10,plg4184,Polynesian,175,$170
+2026-01-10,pl54150,Polynesian,100,$180
+2026-01-10,pl34241,Polynesian,175,$165
+2026-01-10,ple4222,Polynesian,100,$163
+2026-01-10,plb4248,Polynesian,125,$161
+2026-01-10,pla4246,Polynesian,150,$170
+2026-01-10,pl34261,Polynesian,125,$173
+2026-01-10,pl54265,Polynesian,250,$152
+2026-01-10,pl54264,Polynesian,250,$152
+2026-01-10,plc4274,Polynesian,150,$164
+2026-01-10,pla4276,Polynesian,50,$178
+2026-01-10,pl94275,Polynesian,120,$159
+2026-01-10,pl24278,Polynesian,135,$154
+2026-01-10,pl24279,Polynesian,150,$170
+2026-01-10,pl24280,Polynesian,250,$159
+2026-01-10,pl84220,Polynesian,65,$174
+2026-01-10,pl84218,Polynesian,65,$165
+2026-01-10,pl34286,Polynesian,100,$155
+2026-01-10,ple4284,Polynesian,112,$175
+2026-01-10,ple4285,Polynesian,100,$176
+2026-01-10,pl34296,Polynesian,75,$172
+2026-01-10,plf4293,Polynesian,250,$164
+2026-01-10,rr61906,RivieraResort,200,$122
+2026-01-10,rra2013,RivieraResort,300,$120
+2026-01-10,rr82044,RivieraResort,525,$111
+2026-01-10,rrf2050,RivieraResort,215,$119
+2026-01-10,rr82070,RivieraResort,100,$139
+2026-01-10,rrg2087,RivieraResort,75,$127
+2026-01-10,rr92110,RivieraResort,150,$135
+2026-01-10,rrf2115,RivieraResort,125,$136
+2026-01-10,rr62111,RivieraResort,300,$116
+2026-01-10,rrc2122,RivieraResort,75,$132
+2026-01-10,rrc2116,RivieraResort,300,$104
+2026-01-10,rrc2117,RivieraResort,200,$120
+2026-01-10,rra2124,RivieraResort,200,$116
+2026-01-10,rra2125,RivieraResort,200,$129
+2026-01-10,rr82119,RivieraResort,350,$115
+2026-01-10,rrc2129,RivieraResort,200,$130
+2026-01-10,ssa7896,SaratogaSprings,100,$102
+2026-01-10,ss56778,SaratogaSprings,320,$110
+2026-01-10,ss57696,SaratogaSprings,150,$100
+2026-01-10,ss57712,SaratogaSprings,200,$105
+2026-01-10,ss57713,SaratogaSprings,200,$110
+2026-01-10,ssc7765,SaratogaSprings,200,$106
+2026-01-10,ss57806,SaratogaSprings,50,$120
+2026-01-10,ssd7228,SaratogaSprings,500,$96
+2026-01-10,ssa7741,SaratogaSprings,150,$115
+2026-01-10,ssa7826,SaratogaSprings,150,$100
+2026-01-10,ss27834,SaratogaSprings,200,$107
+2026-01-10,ss27725,SaratogaSprings,225,$94
+2026-01-10,ss27838,SaratogaSprings,200,$103
+2026-01-10,ss27840,SaratogaSprings,160,$104
+2026-01-10,ss27843,SaratogaSprings,150,$104
+2026-01-10,sse7846,SaratogaSprings,375,$105
+2026-01-10,sse7848,SaratogaSprings,375,$105
+2026-01-10,sse7849,SaratogaSprings,375,$109
+2026-01-10,sse7850,SaratogaSprings,375,$105
+2026-01-10,ssa7851,SaratogaSprings,65,$113
+2026-01-10,ss87858,SaratogaSprings,200,$111
+2026-01-10,ss37831,SaratogaSprings,225,$104
+2026-01-10,ss87845,SaratogaSprings,285,$102
+2026-01-10,ssg7854,SaratogaSprings,130,$113
+2026-01-10,ssg7855,SaratogaSprings,200,$118
+2026-01-10,ssa7335,SaratogaSprings,300,$110
+2026-01-10,ss57863,SaratogaSprings,120,$108
+2026-01-10,ssg7856,SaratogaSprings,150,$102
+2026-01-10,ssd7670,SaratogaSprings,150,$114
+2026-01-10,ss37869,SaratogaSprings,25,$135
+2026-01-10,ss37868,SaratogaSprings,25,$129
+2026-01-10,ss57861,SaratogaSprings,120,$115
+2026-01-10,ss37872,SaratogaSprings,200,$103
+2026-01-10,ss37860,SaratogaSprings,150,$104
+2026-01-10,ss37862,SaratogaSprings,150,$104
+2026-01-10,ssa7879,SaratogaSprings,150,$98
+2026-01-10,ssa7877,SaratogaSprings,160,$105
+2026-01-10,ss57841,SaratogaSprings,50,$128
+2026-01-10,ss77876,SaratogaSprings,160,$110
+2026-01-10,ssb6858,SaratogaSprings,130,$96
+2026-01-10,ss57880,SaratogaSprings,50,$114
+2026-01-10,ssc7885,SaratogaSprings,160,$92
+2026-01-10,ssb7883,SaratogaSprings,200,$104
+2026-01-10,ss77866,SaratogaSprings,150,$106
+2026-01-10,ssf7672,SaratogaSprings,100,$118
+2026-01-10,ss37882,SaratogaSprings,160,$103
+2026-01-10,ss97893,SaratogaSprings,160,$118
+2026-01-10,ssg7895,SaratogaSprings,160,$113
+2026-01-10,ssb7884,SaratogaSprings,200,$103
+2026-01-10,ssa7897,SaratogaSprings,200,$96
+2026-01-10,vbe2407,VeroBeach,200,$55
+2026-01-10,vb62353,VeroBeach,200,$46
+2026-01-10,vb32443,VeroBeach,293,$42
+2026-01-10,vbb2440,VeroBeach,150,$47
+2026-01-10,vb22449,VeroBeach,150,$41
+2026-01-10,vb22450,VeroBeach,50,$63
+2026-01-10,vbb2448,VeroBeach,400,$42
+2026-01-10,vb22453,VeroBeach,210,$54
+2026-01-10,vbe2341,VeroBeach,230,$50
+2026-01-10,vb52459,VeroBeach,100,$53
+2026-01-10,vb52462,VeroBeach,50,$63
+2026-01-10,vbf2465,VeroBeach,85,$59
+2026-01-10,vb32458,VeroBeach,150,$52
+2026-01-10,vb32466,VeroBeach,75,$59
