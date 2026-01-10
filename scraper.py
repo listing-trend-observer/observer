@@ -38,3 +38,23 @@ with open(file_path, 'a', newline='') as f:
             continue
 
 print(f"Recorded {saved_count} listings with unique IDs!")
+
+# --- NEW: DEAL ALERT LOGIC ---
+deals = []
+for item in listings:
+    try:
+        resort = item.find('a', class_='listings-table__listing-resort').get_text(strip=True)
+        price_text = item.find('td', {'data-column': 'price-per-point'}).get_text(strip=True)
+        price = float(price_text.replace('$', ''))
+        
+        # Customize your alert criteria here!
+        if "AnimalKingdom" in resort and price < 110:
+            deals.append(f"AKL DEAL: ${price}/pt (ID: {resort})")
+    except:
+        continue
+
+# If deals are found, write them to a temporary file for the next step
+if deals:
+    with open("alerts.txt", "w") as f:
+        f.write("\n".join(deals))
+
