@@ -122,16 +122,39 @@
             renderCharts(fullData.filter(d => selected.includes(d.resort)), dates, selected);
         };
 
-        function renderSummary(data, selected) {
+function renderSummary(data, selected) {
             const body = document.getElementById('summaryBody');
+            
+            // Get the two dates we want to compare
+            const allDates = [...new Set(fullData.map(d => d.date))].sort();
+            const latestDt = allDates[allDates.length - 1];
+            const sevenDaysAgoDt = allDates[allDates.length - 8] || allDates[0]; // Fallback to oldest data if < 7 days exists
+
             body.innerHTML = selected.map(resort => {
+                // Current stats
                 const resList = data.filter(d => d.resort === resort);
                 if (!resList.length) return '';
-                const avg = resList.reduce((s, c) => s + parseFloat(c.price_per_point.replace('$','')), 0) / resList.length;
-                return `<tr><td>${resort}</td><td>${resList.length}</td><td>$${avg.toFixed(2)}</td><td>+${Math.floor(Math.random()*3)}</td></tr>`;
+                
+                const prices = resList.map(d => parseFloat(d.price_per_point.replace('$','')));
+                const avg = prices.reduce((s, c) => s + c, 0) / resList.length;
+
+                // Historical stats (7 days ago)
+                const historicalList = fullData.filter(d => d.date === sevenDaysAgoDt && d.resort === resort);
+                const netChange = resList.length - historicalList.length;
+                const changeClass = netChange >= 0 ? 'text-success' : 'text-danger';
+                const changeSymbol = netChange >= 0 ? '+' : '';
+
+                return `
+                    <tr>
+                        <td>${resort}</td>
+                        <td>${resList.length}</td>
+                        <td>$${avg.toFixed(2)}</td>
+                        <td style="color: ${netChange >= 0 ? '#81c995' : '#f28b82'}">
+                            ${changeSymbol}${netChange}
+                        </td>
+                    </tr>`;
             }).join('');
         }
-
         function renderFeed(data) {
             document.getElementById('listingBody').innerHTML = data.slice(0, 50).map(item => `
                 <tr>
