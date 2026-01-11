@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="referrer" content="no-referrer">
-    <title>DVC Intel | Pro Dashboard</title>
+    <title>DVC Intel | Ultimate Tracker</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
     <style>
@@ -19,36 +19,42 @@
             --success: #81c995; --warning: #f28b82;
         }
         body { font-family: 'Segoe UI', system-ui, sans-serif; margin: 0; padding: 20px; background: var(--bg); color: var(--text); }
-        .container { max-width: 1400px; margin: auto; }
+        .container { max-width: 1600px; margin: auto; }
         
-        header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
-        .controls { display: grid; grid-template-columns: 1fr 2fr; gap: 16px; margin-bottom: 24px; }
+        header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .controls { display: grid; grid-template-columns: 1fr 2fr; gap: 16px; margin-bottom: 20px; }
         
-        .card { background: var(--card-bg); padding: 20px; border-radius: 12px; box-shadow: var(--shadow); border: 1px solid var(--border); margin-bottom: 20px; }
-        .label { font-size: 12px; font-weight: 700; color: var(--text-sub); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 10px; display: block; }
+        /* Main Dashboard Grid */
+        .dash-row { display: grid; grid-template-columns: 1.5fr 1fr 1fr; gap: 16px; margin-bottom: 20px; }
+        .card { background: var(--card-bg); padding: 16px; border-radius: 12px; border: 1px solid var(--border); box-shadow: var(--shadow); }
+        .label { font-size: 11px; font-weight: 700; color: var(--text-sub); text-transform: uppercase; margin-bottom: 12px; display: block; }
 
-        .summary-table { width: 100%; border-collapse: collapse; }
-        .summary-table th { background: var(--hover); text-align: left; padding: 10px; font-size: 11px; color: var(--text-sub); }
-        .summary-table td { padding: 12px 10px; border-bottom: 1px solid var(--border); font-size: 13px; font-weight: 500; }
+        /* Summary & Chart Heights */
+        .summary-container { height: 350px; overflow-y: auto; }
+        .chart-container { height: 350px; }
 
+        .summary-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+        .summary-table th { text-align: left; color: var(--text-sub); border-bottom: 1px solid var(--border); padding: 8px; font-size: 10px; }
+        .summary-table td { padding: 10px 8px; border-bottom: 1px solid var(--border); }
+
+        /* Dropdown & Inputs */
         .dropdown-container { position: relative; }
         .multiselect-btn { padding: 12px; border-radius: 8px; border: 1px solid var(--border); background: var(--card-bg); color: var(--text); cursor: pointer; display: flex; justify-content: space-between; }
-        .dropdown-content { display: none; position: absolute; z-index: 100; width: 100%; background: var(--card-bg); border: 1px solid var(--border); border-radius: 8px; max-height: 400px; overflow-y: auto; margin-top: 4px; box-shadow: var(--shadow); }
+        .dropdown-content { display: none; position: absolute; z-index: 100; width: 100%; background: var(--card-bg); border: 1px solid var(--border); border-radius: 8px; max-height: 400px; overflow-y: auto; margin-top: 4px; }
         .dropdown-content.show { display: block; }
-        .bulk-actions { display: flex; gap: 10px; padding: 10px; border-bottom: 1px solid var(--border); position: sticky; top: 0; background: var(--card-bg); }
-        .bulk-btn { flex: 1; padding: 6px; font-size: 11px; font-weight: bold; cursor: pointer; border-radius: 4px; border: 1px solid var(--primary); background: transparent; color: var(--primary); }
-        .resort-option { display: block; padding: 10px 12px; cursor: pointer; font-size: 14px; }
+        .bulk-actions { display: flex; gap: 10px; padding: 10px; border-bottom: 1px solid var(--border); background: var(--card-bg); position: sticky; top: 0; }
+        .bulk-btn { flex: 1; padding: 4px; font-size: 10px; cursor: pointer; border-radius: 4px; border: 1px solid var(--primary); background: transparent; color: var(--primary); font-weight: bold; }
+        .resort-option { display: block; padding: 8px 12px; cursor: pointer; font-size: 13px; }
         input[type="text"] { padding: 12px; border-radius: 8px; border: 1px solid var(--border); background: var(--card-bg); color: var(--text); width: 100%; box-sizing: border-box; }
 
+        /* Feed Table */
         .feed-table { width: 100%; border-collapse: collapse; }
-        .feed-table th { text-align: left; padding: 12px; font-size: 12px; color: var(--text-sub); border-bottom: 2px solid var(--border); cursor: pointer; }
-        .feed-table td { padding: 14px 12px; border-bottom: 1px solid var(--border); font-size: 14px; }
-        tr:hover { background: var(--hover); }
-
-        .trend-up { color: var(--warning); font-size: 11px; }
-        .trend-down { color: var(--success); font-size: 11px; }
+        .feed-table th { text-align: left; padding: 12px; font-size: 11px; color: var(--text-sub); border-bottom: 2px solid var(--border); cursor: pointer; }
+        .feed-table td { padding: 12px; border-bottom: 1px solid var(--border); font-size: 14px; }
+        
+        .trend-up { color: var(--warning); }
+        .trend-down { color: var(--success); }
         .listing-link { color: var(--primary); text-decoration: none; font-weight: 600; }
-        .badge-new { background: rgba(26, 115, 232, 0.15); color: var(--primary); padding: 2px 6px; border-radius: 4px; font-size: 10px; }
     </style>
 </head>
 <body>
@@ -74,21 +80,33 @@
             <input type="text" id="searchInput" placeholder="Search by ID, Resort, or Points..." onkeyup="updateDashboard()">
         </div>
 
-        <div class="card">
-            <span class="label">Resort Summary (Market Averages & Velocity)</span>
-            <table class="summary-table">
-                <thead>
-                    <tr>
-                        <th>Resort</th>
-                        <th># Contracts</th>
-                        <th>Avg Price / Pt</th>
-                        <th>Avg Days</th>
-                        <th>New (7d)</th>
-                        <th>Sold (7d)</th>
-                    </tr>
-                </thead>
-                <tbody id="summaryBody"></tbody>
-            </table>
+        <div class="dash-row">
+            <div class="card summary-container">
+                <span class="label">Resort Summary (7-Day Velocity)</span>
+                <table class="summary-table">
+                    <thead>
+                        <tr>
+                            <th>Resort</th>
+                            <th>Qty</th>
+                            <th>Avg $/Pt</th>
+                            <th>Avg Days</th>
+                            <th>New (7d)</th>
+                            <th>Sold (7d)</th>
+                        </tr>
+                    </thead>
+                    <tbody id="summaryBody"></tbody>
+                </table>
+            </div>
+
+            <div class="card chart-container">
+                <span class="label">Inventory Trend</span>
+                <canvas id="inventoryChart"></canvas>
+            </div>
+
+            <div class="card chart-container">
+                <span class="label">Price Trend ($/Pt)</span>
+                <canvas id="priceTrendChart"></canvas>
+            </div>
         </div>
 
         <div class="card">
@@ -110,12 +128,9 @@
     </div>
 
     <script>
-        let fullData = [];
+        let fullData = [], inventoryChart, priceTrendChart;
         let currentSort = { col: 'price_per_point', dir: 'asc' };
         const slugs = {"Animal Kingdom": "animal-kingdom-lodge", "Aulani": "aulani-disney-resort", "Bay Lake Tower": "bay-lake-tower", "Beach Club": "beach-club-villas", "BoardWalk": "boardwalk-villas", "Boulder Ridge": "boulder-ridge-villas", "Copper Creek": "copper-creek-villas", "Grand Californian": "grand-californian", "Grand Floridian": "grand-floridian", "Hilton Head": "hilton-head", "Old Key West": "old-key-west", "Polynesian": "polynesian", "Riviera": "riviera-resort", "Saratoga Springs": "saratoga-springs", "Vero Beach": "vero-beach"};
-
-        function toggleDropdown() { document.getElementById('resortDropdown').classList.toggle('show'); }
-        window.onclick = e => { if (!e.target.closest('.dropdown-container')) document.getElementById('resortDropdown').classList.remove('show'); }
 
         Papa.parse('./data/listings_history.csv', {
             download: true, header: true,
@@ -153,52 +168,65 @@
             const prevDt = dates[dates.length - 2];
             const weekAgoDt = dates[dates.length - 7] || dates[0];
 
-            document.getElementById('selectedCount').innerText = `${selected.length} Resorts Selected`;
+            document.getElementById('selectedCount').innerText = `${selected.length} Selected`;
 
-            const latestData = fullData.filter(d => d.date === latestDt && selected.includes(d.resort));
-            const prevData = fullData.filter(d => d.date === prevDt && selected.includes(d.resort));
-            const weekAgoData = fullData.filter(d => d.date === weekAgoDt && selected.includes(d.resort));
+            const latest = fullData.filter(d => d.date === latestDt && selected.includes(d.resort));
+            const prev = fullData.filter(d => d.date === prevDt && selected.includes(d.resort));
+            const weekAgo = fullData.filter(d => d.date === weekAgoDt && selected.includes(d.resort));
             
-            renderSummary(latestData, prevData, weekAgoData, selected);
+            renderSummary(latest, prev, weekAgo, selected);
+            renderCharts(fullData.filter(d => selected.includes(d.resort)), dates, selected);
             
-            const filteredFeed = latestData.filter(d => d.listing_id.toLowerCase().includes(search) || d.resort.toLowerCase().includes(search));
+            const filteredFeed = latest.filter(d => d.listing_id.toLowerCase().includes(search) || d.resort.toLowerCase().includes(search));
             renderFeed(filteredFeed);
         }
 
         function renderSummary(latest, prev, weekAgo, selectedResorts) {
             const body = document.getElementById('summaryBody');
             body.innerHTML = "";
-            
             selectedResorts.sort().forEach(resort => {
                 const resLatest = latest.filter(d => d.resort === resort);
-                if (resLatest.length === 0) return;
+                if (!resLatest.length) return;
 
-                // Price Metrics
                 const avgNow = resLatest.reduce((s, d) => s + parseFloat(d.price_per_point.replace('$','')), 0) / resLatest.length;
                 const resPrev = prev.filter(d => d.resort === resort);
                 const avgPrev = resPrev.length ? (resPrev.reduce((s, d) => s + parseFloat(d.price_per_point.replace('$','')), 0) / resPrev.length) : avgNow;
                 
-                let trend = "";
-                if (avgNow > avgPrev) trend = `<span class="trend-up">▲</span>`;
-                else if (avgNow < avgPrev) trend = `<span class="trend-down">▼</span>`;
+                let trend = avgNow > avgPrev ? '<span class="trend-up">▲</span>' : (avgNow < avgPrev ? '<span class="trend-down">▼</span>' : '');
 
-                // Velocity Metrics (7 Days)
                 const weekIDs = new Set(weekAgo.filter(d => d.resort === resort).map(d => d.listing_id));
                 const latestIDs = new Set(resLatest.map(d => d.listing_id));
-                
                 const newlyAdded = resLatest.filter(d => !weekIDs.has(d.listing_id)).length;
                 const newlySold = [...weekIDs].filter(id => !latestIDs.has(id)).length;
-
                 const avgDays = resLatest.reduce((s, d) => s + fullData.filter(h => h.listing_id === d.listing_id).length, 0) / resLatest.length;
 
                 body.innerHTML += `<tr>
-                    <td>${resort}</td>
-                    <td>${resLatest.length}</td>
-                    <td>$${avgNow.toFixed(2)} ${trend}</td>
-                    <td>${avgDays.toFixed(1)}</td>
-                    <td style="color:var(--primary)">+${newlyAdded}</td>
-                    <td style="color:var(--warning)">-${newlySold}</td>
+                    <td>${resort}</td><td>${resLatest.length}</td>
+                    <td>$${avgNow.toFixed(2)} ${trend}</td><td>${avgDays.toFixed(1)}</td>
+                    <td style="color:var(--primary)">+${newlyAdded}</td><td style="color:var(--warning)">-${newlySold}</td>
                 </tr>`;
+            });
+        }
+
+        function renderCharts(data, dates, selected) {
+            if (inventoryChart) inventoryChart.destroy();
+            if (priceTrendChart) priceTrendChart.destroy();
+            const colors = ['#8ab4f8','#81c995','#fdd663','#f28b82','#c58af9'];
+            const commonOpt = { maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { display: false }, y: { ticks: { font: { size: 9 } } } } };
+
+            inventoryChart = new Chart(document.getElementById('inventoryChart'), {
+                type: 'line',
+                data: { labels: dates, datasets: selected.slice(0,5).map((r, i) => ({ label: r, data: dates.map(dt => data.filter(d => d.date === dt && d.resort === r).length), borderColor: colors[i], tension: 0.3, pointRadius: 0 })) },
+                options: commonOpt
+            });
+
+            priceTrendChart = new Chart(document.getElementById('priceTrendChart'), {
+                type: 'line',
+                data: { labels: dates, datasets: selected.slice(0,5).map((r, i) => ({ label: r, data: dates.map(dt => {
+                    const day = data.filter(d => d.date === dt && d.resort === r);
+                    return day.length ? (day.reduce((s, d) => s + parseFloat(d.price_per_point.replace('$','')), 0) / day.length).toFixed(2) : null;
+                }), borderColor: colors[i], borderDash: [5, 5], tension: 0.3, pointRadius: 2 })) },
+                options: commonOpt
             });
         }
 
@@ -209,20 +237,15 @@
                 if (currentSort.col === 'points') { vA = parseInt(a.points); vB = parseInt(b.points); }
                 return currentSort.dir === 'asc' ? (vA > vB ? 1 : -1) : (vA < vB ? 1 : -1);
             });
-
             const body = document.getElementById('listingBody');
             body.innerHTML = "";
             data.forEach(item => {
                 const days = fullData.filter(d => d.listing_id === item.listing_id).length;
-                const url = `https://www.dvcresalemarket.com/listings/${slugs[item.resort] || ''}/${item.listing_id.toLowerCase().trim()}/`;
-                
                 body.innerHTML += `<tr>
                     <td style="font-family:monospace; color:var(--text-sub);">${item.listing_id}</td>
-                    <td><a href="${url}" target="_blank" rel="noreferrer" class="listing-link">${item.resort}</a></td>
-                    <td>${item.points}</td>
-                    <td>${item.price_per_point}</td>
-                    <td>${days}</td>
-                    <td>${days <= 2 ? '<span class="badge-new">RECENT</span>' : ''}</td>
+                    <td><a href="https://www.dvcresalemarket.com/listings/${slugs[item.resort] || ''}/${item.listing_id.toLowerCase().trim()}/" target="_blank" rel="noreferrer" class="listing-link">${item.resort}</a></td>
+                    <td>${item.points}</td><td>${item.price_per_point}</td><td>${days}</td>
+                    <td>${days <= 1 ? '<span style="color:var(--primary); font-size:10px; font-weight:bold;">NEW</span>' : ''}</td>
                 </tr>`;
             });
         }
