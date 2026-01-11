@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="referrer" content="no-referrer"> <title>DVC Intelligence | Pro Tracker</title>
+    <meta name="referrer" content="no-referrer">
+    <title>DVC Intel | Multi-Tracker</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
     <style>
@@ -24,21 +25,35 @@
         .label { font-size: 11px; color: var(--text-sub); text-transform: uppercase; letter-spacing: 1px; font-weight: 700; margin-bottom: 5px; }
         .chart-container { background: var(--card-bg); padding: 20px; border-radius: 16px; height: 380px; border: 1px solid var(--border); }
         
+        /* Multi-Select Styling */
         .controls { display: flex; gap: 15px; margin-bottom: 25px; flex-wrap: wrap; }
-        .search-box { flex-grow: 1; min-width: 300px; }
-        input, select { 
+        .dropdown-container { position: relative; flex: 1; min-width: 250px; }
+        .multiselect-btn { 
+            padding: 12px; border-radius: 10px; border: 2px solid var(--border); 
+            background: var(--card-bg); color: var(--text); cursor: pointer; text-align: left;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .dropdown-content {
+            display: none; position: absolute; z-index: 100; width: 100%;
+            background: var(--card-bg); border: 1px solid var(--border); border-radius: 10px;
+            max-height: 300px; overflow-y: auto; box-shadow: var(--shadow); margin-top: 5px;
+        }
+        .dropdown-content label { display: block; padding: 10px; cursor: pointer; font-size: 14px; }
+        .dropdown-content label:hover { background: var(--hover); }
+        .dropdown-content input { width: auto; margin-right: 10px; }
+        .show { display: block; }
+
+        input[type="text"] { 
             padding: 12px; border-radius: 10px; border: 2px solid var(--border); 
             background: var(--card-bg); color: var(--text); font-size: 16px; width: 100%; box-sizing: border-box;
         }
 
         table { width: 100%; border-collapse: collapse; margin-top: 15px; }
         th.sortable { text-align: left; font-size: 12px; color: var(--text-sub); padding: 12px; border-bottom: 2px solid var(--border); cursor: pointer; }
-        th.sortable:hover { color: var(--primary); }
         td { padding: 15px; border-bottom: 1px solid var(--border); font-size: 14px; }
         tr:hover { background: var(--hover); }
         
         .listing-link { color: var(--primary); text-decoration: none; font-weight: 600; }
-        .listing-link:hover { text-decoration: underline; }
         .badge-new { background: rgba(26, 115, 232, 0.15); color: var(--primary); padding: 4px 10px; border-radius: 20px; font-size: 10px; font-weight: 800; }
         .badge-drop { background: rgba(217, 48, 37, 0.15); color: #f28b82; padding: 4px 10px; border-radius: 20px; font-size: 10px; font-weight: 800; border: 1px solid #d93025; }
         .theme-toggle { cursor: pointer; padding: 8px 16px; border-radius: 20px; border: 1px solid var(--primary); background: transparent; color: var(--primary); font-size: 12px; font-weight: bold; }
@@ -52,13 +67,21 @@
         </header>
 
         <div class="controls">
-            <div style="flex: 1; min-width: 250px;">
-                <label class="label">Filter Resort</label>
-                <select id="resortFilter"><option value="All">All Resorts</option></select>
+            <div class="dropdown-container">
+                <label class="label">Filter Resorts (Multi-Select)</label>
+                <div class="multiselect-btn" onclick="toggleDropdown()">
+                    <span id="selectedCount">All Resorts selected</span>
+                    <span>▼</span>
+                </div>
+                <div id="resortDropdown" class="dropdown-content">
+                    <label><input type="checkbox" id="selectAll" checked onchange="handleSelectAll()"> <strong>Select All</strong></label>
+                    <hr style="border: 0; border-top: 1px solid var(--border); margin: 5px 0;">
+                    <div id="resortOptions"></div>
+                </div>
             </div>
-            <div class="search-box">
-                <label class="label">Search listings (ID, Resort, Use Year...)</label>
-                <input type="text" id="searchInput" placeholder="e.g. AK85326 or Dec..." onkeyup="updateDashboard()">
+            <div style="flex: 1; min-width: 300px;">
+                <label class="label">Search listings</label>
+                <input type="text" id="searchInput" placeholder="Search ID, Resort, etc..." onkeyup="updateDashboard()">
             </div>
         </div>
 
@@ -104,10 +127,17 @@
             "Saratoga Springs": "saratoga-springs", "Vero Beach": "vero-beach"
         };
 
+        // UI Helpers
+        function toggleDropdown() { document.getElementById("resortDropdown").classList.toggle("show"); }
+        window.onclick = function(event) {
+            if (!event.target.closest('.dropdown-container')) {
+                document.getElementById("resortDropdown").classList.remove("show");
+            }
+        }
+
         function toggleTheme() {
             const html = document.documentElement;
-            const theme = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
-            html.setAttribute('data-theme', theme);
+            html.setAttribute('data-theme', html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
             updateDashboard();
         }
 
@@ -115,22 +145,24 @@
             download: true, header: true,
             complete: function(results) {
                 fullData = results.data.filter(d => d.date && d.listing_id);
-                if(fullData.length > 0) {
-                    initFilter();
-                    updateDashboard();
-                }
+                if(fullData.length > 0) { initFilters(); updateDashboard(); }
             }
         });
 
-        function initFilter() {
-            const selector = document.getElementById('resortFilter');
+        function initFilters() {
+            const container = document.getElementById('resortOptions');
             const resorts = [...new Set(fullData.map(d => d.resort))].filter(r => r).sort();
             resorts.forEach(r => {
-                let opt = document.createElement('option');
-                opt.value = r; opt.innerHTML = r;
-                selector.appendChild(opt);
+                const label = document.createElement('label');
+                label.innerHTML = `<input type="checkbox" class="resort-check" value="${r}" checked onchange="updateDashboard()"> ${r}`;
+                container.appendChild(label);
             });
-            selector.addEventListener('change', () => updateDashboard());
+        }
+
+        function handleSelectAll() {
+            const checked = document.getElementById('selectAll').checked;
+            document.querySelectorAll('.resort-check').forEach(cb => cb.checked = checked);
+            updateDashboard();
         }
 
         function handleSort(col) {
@@ -140,46 +172,40 @@
         }
 
         function updateDashboard() {
-            const selectedResort = document.getElementById('resortFilter').value;
+            const selectedResorts = Array.from(document.querySelectorAll('.resort-check:checked')).map(cb => cb.value);
             const searchTerm = document.getElementById('searchInput').value.toLowerCase();
-            
+            document.getElementById('selectedCount').innerText = selectedResorts.length === 0 ? "No resorts selected" : `${selectedResorts.length} Resorts Selected`;
+
             const dates = [...new Set(fullData.map(d => d.date))].sort();
             const latestDate = dates[dates.length - 1];
             const prevDate = dates[dates.length - 2] || latestDate;
 
-            let filtered = selectedResort === "All" ? fullData : fullData.filter(d => d.resort === selectedResort);
-            
-            // Apply Search filter for the table, but keep charts focused on resort only
-            const tableFiltered = filtered.filter(d => 
-                d.listing_id.toLowerCase().includes(searchTerm) || 
-                d.resort.toLowerCase().includes(searchTerm)
-            );
+            let filtered = fullData.filter(d => selectedResorts.includes(d.resort));
+            const tableFiltered = filtered.filter(d => d.listing_id.toLowerCase().includes(searchTerm) || d.resort.toLowerCase().includes(searchTerm));
 
             const latest = tableFiltered.filter(d => d.date === latestDate);
             const prev = tableFiltered.filter(d => d.date === prevDate);
 
+            // Metrics
             document.getElementById('totalListings').innerText = latest.length;
             const avg = latest.reduce((s, c) => s + parseFloat(c.price_per_point.replace('$','')), 0) / (latest.length || 1);
             document.getElementById('avgPrice').innerText = `$${avg.toFixed(2)}`;
             const latestIDs = new Set(latest.map(l => l.listing_id));
             document.getElementById('soldCount').innerText = prev.filter(l => !latestIDs.has(l.listing_id)).length;
 
-            renderCharts(filtered, dates, selectedResort);
+            renderCharts(filtered, dates, selectedResorts);
             renderTable(latest, prev);
         }
 
-        function renderCharts(data, dates, selected) {
+        function renderCharts(data, dates, resorts) {
             if (inventoryChart) inventoryChart.destroy();
             if (priceTrendChart) priceTrendChart.destroy();
-            const resorts = selected === "All" ? [...new Set(data.map(d => d.resort))].filter(r => r) : [selected];
             const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
-            const gridColor = isDark ? '#3c4043' : '#e0e0e0';
-            const labelColor = isDark ? '#e8eaed' : '#5f6368';
+            const colors = ['#8ab4f8','#81c995','#fdd663','#f28b82','#c58af9','#81c995','#ff8bcb'];
+            const commonOpt = { maintainAspectRatio: false, plugins: { legend: { labels: { color: isDark ? '#e8eaed' : '#5f6368' } } }, scales: { x: { grid: { display: false }, ticks: { color: isDark ? '#e8eaed' : '#5f6368' } }, y: { grid: { color: isDark ? '#3c4043' : '#e0e0e0' }, ticks: { color: isDark ? '#e8eaed' : '#5f6368' } } } };
 
-            const opt = { maintainAspectRatio: false, plugins: { legend: { labels: { color: labelColor } } }, scales: { x: { grid: { display: false }, ticks: { color: labelColor } }, y: { grid: { color: gridColor }, ticks: { color: labelColor } } } };
-
-            inventoryChart = new Chart(document.getElementById('inventoryChart'), { type: 'line', data: { labels: dates, datasets: resorts.map((r, i) => ({ label: r, data: dates.map(dt => data.filter(d => d.date === dt && d.resort === r).length), borderColor: ['#8ab4f8','#81c995','#fdd663','#f28b82'][i%4], tension: 0.3 })) }, options: opt });
-            priceTrendChart = new Chart(document.getElementById('priceTrendChart'), { type: 'line', data: { labels: dates, datasets: resorts.map((r, i) => ({ label: r, data: dates.map(dt => { const day = data.filter(d => d.date === dt && d.resort === r); return day.length ? (day.reduce((s, d) => s + parseFloat(d.price_per_point.replace('$','')), 0) / day.length).toFixed(2) : null; }), borderColor: ['#8ab4f8','#81c995','#fdd663','#f28b82'][i%4], borderDash: [5, 5], tension: 0.3 })) }, options: opt });
+            inventoryChart = new Chart(document.getElementById('inventoryChart'), { type: 'line', data: { labels: dates, datasets: resorts.map((r, i) => ({ label: r, data: dates.map(dt => data.filter(d => d.date === dt && d.resort === r).length), borderColor: colors[i % colors.length], tension: 0.3 })) }, options: commonOpt });
+            priceTrendChart = new Chart(document.getElementById('priceTrendChart'), { type: 'line', data: { labels: dates, datasets: resorts.map((r, i) => ({ label: r, data: dates.map(dt => { const day = data.filter(d => d.date === dt && d.resort === r); return day.length ? (day.reduce((s, d) => s + parseFloat(d.price_per_point.replace('$','')), 0) / day.length).toFixed(2) : null; }), borderColor: colors[i % colors.length], borderDash: [5, 5], tension: 0.3 })) }, options: commonOpt });
         }
 
         function renderTable(listings, prevListings) {
@@ -201,15 +227,9 @@
                     const diff = parseFloat(yest.price_per_point.replace('$','')) - parseFloat(item.price_per_point.replace('$',''));
                     if (diff > 0) insight = `<span class="badge-drop">📉 -$${diff.toFixed(2)}</span>`;
                 }
-
                 const slug = resortSlugs[item.resort] || item.resort.toLowerCase().replace(/ /g, '-');
                 const url = `https://www.dvcresalemarket.com/listings/${slug}/${item.listing_id.toLowerCase().trim()}/`;
-
-                body.innerHTML += `<tr>
-                    <td style="font-family: monospace; font-size: 12px; color: var(--text-sub);">${item.listing_id}</td>
-                    <td><a href="${url}" target="_blank" rel="noreferrer" class="listing-link">${item.resort}</a></td>
-                    <td>${item.points}</td><td>${item.price_per_point}</td><td>${days}</td><td>${insight}</td>
-                </tr>`;
+                body.innerHTML += `<tr><td style="font-family: monospace; font-size: 12px; color: var(--text-sub);">${item.listing_id}</td><td><a href="${url}" target="_blank" rel="noreferrer" class="listing-link">${item.resort}</a></td><td>${item.points}</td><td>${item.price_per_point}</td><td>${days}</td><td>${insight}</td></tr>`;
             });
         }
     </script>
