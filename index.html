@@ -179,38 +179,47 @@
             });
         }
 
-        // 3. AI SUMMARY LOGIC
-window.generateAISummary = async function() {
-    const btn = document.getElementById('aiBtn');
-    const content = document.getElementById('aiContent');
-    btn.disabled = true;
-    content.innerText = "Analyzing 2026 market trends...";
+// 3. AI SUMMARY LOGIC - 2026 STABLE VERSION
+        window.generateAISummary = async function() {
+            const btn = document.getElementById('aiBtn');
+            const content = document.getElementById('aiContent');
+            btn.disabled = true;
+            content.innerText = "Consulting Gemini 3.0 Analysts...";
 
-    // Try Gemini 2.5 Flash (Current 2026 Standard)
-    // If that fails, it falls back to Gemini 3 Flash
-    const modelNames = ["gemini-2.5-flash", "gemini-3-flash"];
-    
-    for (let modelName of modelNames) {
-        try {
-            const model = genAI.getGenerativeModel({ model: modelName });
-            const tableText = Array.from(document.querySelectorAll('#summaryBody tr'))
-                                .map(tr => tr.innerText).join('\n');
+            // 2026 PRODUCTION MODELS
+            // We use 'gemini-3-flash' as the primary and 'gemini-2.5-flash' as the backup
+            const models = ["gemini-3-flash", "gemini-2.5-flash"];
             
-            const prompt = `Act as a DVC resale expert. Based on this data, give 3 bullet points on the best 'buys' right now. Focus on price and inventory. Data:\n${tableText}`;
-            
-            const result = await model.generateContent(prompt);
-            const response = await result.response;
-            content.innerHTML = response.text().replace(/\n/g, '<br>').replace(/\*\*/g, '');
+            for (const modelId of models) {
+                try {
+                    const model = genAI.getGenerativeModel({ model: modelId });
+                    const tableText = Array.from(document.querySelectorAll('#summaryBody tr'))
+                                        .map(tr => tr.innerText).join('\n');
+
+                    const prompt = `Act as a Disney Vacation Club (DVC) resale analyst. 
+                    Based on this live market data, provide 3 high-impact bullet points identifying 
+                    the best "value" resorts right now. Data:\n${tableText}`;
+
+                    const result = await model.generateContent(prompt);
+                    const response = await result.response;
+                    
+                    // Success! Render and exit the loop
+                    content.innerHTML = response.text()
+                        .replace(/\n/g, '<br>')
+                        .replace(/\*\*/g, '<strong>')
+                        .replace(/\*\*/g, '</strong>');
+                    btn.disabled = false;
+                    return; 
+                } catch (err) {
+                    console.warn(`Attempt with ${modelId} failed:`, err);
+                    // If this was the last model, show error
+                    if (modelId === models[models.length - 1]) {
+                        content.innerHTML = `<span style="color:#f28b82">AI Error: Please verify your API Key is active in Google AI Studio and has "Pay-as-you-go" enabled for 2026 models.</span>`;
+                    }
+                }
+            }
             btn.disabled = false;
-            return; // Exit if successful
-        } catch (err) {
-            console.warn(`Model ${modelName} failed, trying next...`, err);
-        }
-    }
-
-    content.innerHTML = `<span style="color:#f28b82">AI Error: All models failed. Please ensure your API Key in Google AI Studio is not restricted to a specific project.</span>`;
-    btn.disabled = false;
-};
-    </script>
+        };
+</script>
 </body>
 </html>
