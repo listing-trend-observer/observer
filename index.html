@@ -171,7 +171,7 @@
                 const tableRows = Array.from(document.querySelectorAll('#summaryBody tr')).map(tr => tr.innerText).join("\n");
                 
                 // FIXED: Removed the apiVersion: 'v1beta' parameter
-                const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+                const model = genAI.getGenerativeModel({ model: "gemini-3-flash" });
                 
                 const prompt = `Analyze this DVC data and give 3 bullet points on the best deals and inventory levels:\n${tableRows}`;
                 
