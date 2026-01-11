@@ -194,7 +194,7 @@
             const content = document.getElementById('aiContent');
             btn.disabled = true; content.innerText = "Analyzing 2026 market trends...";
             try {
-                const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+                const model = genAI.getGenerativeModel({ model: "gemini-3-flash" });
                 const tableText = Array.from(document.querySelectorAll('#summaryBody tr')).map(tr => tr.innerText).join('\n');
                 const prompt = `Act as a DVC resale analyst. Review this table (Resort, Qty, Avg Price, Median, Size, 7d Change) and give 3 bullet points on the best values or largest inventory drops. Mention that buyers are currently navigating the new 2026 $500 admin fee.\n${tableText}`;
                 const result = await model.generateContent(prompt);
