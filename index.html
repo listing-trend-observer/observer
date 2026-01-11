@@ -250,7 +250,7 @@ window.generateAISummary = async function() {
         const tableRows = Array.from(document.querySelectorAll('#summaryBody tr')).map(tr => tr.innerText).join("\n");
         
         // UPDATED MODEL NAME BELOW
-        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash-latest" });
+        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" }, { apiVersion: 'v1beta' });
         
         const prompt = `You are a DVC resale expert. Analyze this resort summary data and provide exactly 3 bullet points. 
         Focus on: 1. Which resort has the best price-per-point value right now? 2. High inventory vs low inventory warning. 3. Recent sales velocity.
