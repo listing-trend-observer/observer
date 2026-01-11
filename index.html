@@ -138,7 +138,13 @@
         Papa.parse('./data/listings_history.csv', {
             download: true, header: true,
             complete: res => {
-                fullData = res.data.filter(d => d.date && d.listing_id);
+                fullData = res.data.filter(d => d.date && d.listing_id).map(d => {
+                    try {
+                        const dateObj = new Date(d.date);
+                        d.date = dateObj.toISOString().split('T')[0];
+                    } catch(e) { /* ignore parse errors */ }
+                    return d;
+                });
                 initResorts();
                 updateDashboard();
             }
@@ -228,7 +234,8 @@
             });
             const body = document.getElementById('listingBody');
             body.innerHTML = data.map(item => {
-                const url = `https://www.dvcresalemarket.com/listings/${item.slug || ''}`;
+                const cleanId = item.listing_id.replace(/\D/g,'');
+                const url = `https://www.dvcresalemarket.com/listings/listing-${cleanId}/`;
                 return `<tr>
                     <td><a href="${url}" target="_blank" class="listing-link">${item.listing_id}</a></td>
                     <td>${item.resort}</td>
@@ -240,39 +247,36 @@
         }
 
         // --- AI LOGIC ---
-window.generateAISummary = async function() {
-    const loader = document.getElementById('aiLoading');
-    const content = document.getElementById('aiContent');
-    loader.style.display = 'block';
-    content.style.opacity = '0.5';
-    
-    try {
-        const tableRows = Array.from(document.querySelectorAll('#summaryBody tr')).map(tr => tr.innerText).join("\n");
-        
-        // UPDATED MODEL NAME BELOW
-        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" }, { apiVersion: 'v1beta' });
-        
-        const prompt = `You are a DVC resale expert. Analyze this resort summary data and provide exactly 3 bullet points. 
-        Focus on: 1. Which resort has the best price-per-point value right now? 2. High inventory vs low inventory warning. 3. Recent sales velocity.
-        Data:\n${tableRows}`;
-        
-        const result = await model.generateContent(prompt);
-        const text = result.response.text();
-        content.innerHTML = text.replace(/\n/g, '<br>');
-    } catch (e) {
-        content.innerText = "AI Error: " + e.message;
-        console.error(e);
-    } finally {
-        loader.style.display = 'none';
-        content.style.opacity = '1';
-    }
-};
+        window.generateAISummary = async function() {
+            const loader = document.getElementById('aiLoading');
+            const content = document.getElementById('aiContent');
+            loader.style.display = 'block';
+            content.style.opacity = '0.5';
+            
+            try {
+                const tableRows = Array.from(document.querySelectorAll('#summaryBody tr')).map(tr => tr.innerText).join("\n");
+                const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+                
+                const prompt = `You are a DVC resale expert. Analyze this resort summary data and provide exactly 3 bullet points. 
+                Focus on: 1. Which resort has the best price-per-point value right now? 2. High inventory vs low inventory warning. 3. Recent sales velocity.
+                Data:\n${tableRows}`;
+                
+                const result = await model.generateContent(prompt);
+                const text = result.response.text();
+                content.innerHTML = text.replace(/\n/g, '<br>').replace(/\*\*/g, '');
+            } catch (e) {
+                content.innerText = "AI Error: " + e.message;
+                console.error(e);
+            } finally {
+                loader.style.display = 'none';
+                content.style.opacity = '1';
+            }
+        };
 
         window.bulkToggle = (check) => { document.querySelectorAll('.res-chk').forEach(c => c.checked = check); updateDashboard(); };
         window.toggleTheme = () => document.documentElement.setAttribute('data-theme', document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
         window.handleSort = (c) => { currentSort.dir = (currentSort.col === c && currentSort.dir === 'asc') ? 'desc' : 'asc'; currentSort.col = c; updateDashboard(); };
         
-        // Close dropdown when clicking outside
         window.onclick = function(event) {
             if (!event.target.closest('.dropdown-container')) {
                 document.getElementById('resortDropdown').classList.remove('show');
