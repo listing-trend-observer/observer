@@ -7,51 +7,57 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
     <style>
-        :root { --bg: #121212; --card-bg: #1e1e1e; --text: #e8eaed; --text-sub: #9aa0a6; --primary: #8ab4f8; --border: #3c4043; --hover: #2d2e31; --shadow: 0 4px 6px rgba(0,0,0,0.3); }
+        :root { --bg: #121212; --card-bg: #1e1e1e; --text: #e8eaed; --text-sub: #9aa0a6; --primary: #8ab4f8; --border: #3c4043; --hover: #2d2e31; --shadow: 0 4px 6px rgba(0,0,0,0.3); --success: #81c995; --warn: #fdd663; --danger: #f28b82; }
         body { font-family: 'Segoe UI', system-ui, sans-serif; margin: 0; padding: 20px; background: var(--bg); color: var(--text); }
         .container { max-width: 1400px; margin: auto; }
         .card { background: var(--card-bg); padding: 20px; border-radius: 12px; border: 1px solid var(--border); margin-bottom: 20px; box-shadow: var(--shadow); }
-        .controls { display: grid; grid-template-columns: 1fr 2fr; gap: 15px; margin-bottom: 20px; }
+        .controls { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; margin-bottom: 20px; }
         .chart-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px; }
         .chart-box { height: 320px; }
         table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-        th { text-align: left; color: var(--text-sub); border-bottom: 2px solid var(--border); padding: 12px 10px; font-size: 11px; text-transform: uppercase; cursor: pointer; transition: color 0.2s; }
-        th:hover { color: var(--primary); }
+        th { text-align: left; color: var(--text-sub); border-bottom: 2px solid var(--border); padding: 12px 10px; font-size: 11px; text-transform: uppercase; cursor: pointer; }
         td { padding: 12px 10px; border-bottom: 1px solid var(--border); font-size: 13px; }
-        .clickable-row { cursor: pointer; transition: background 0.2s; }
-        .clickable-row:hover { background: var(--hover); }
-        .active-filter { background: rgba(138, 180, 248, 0.1); border-left: 3px solid var(--primary); }
-        .dropdown-content { display: none; position: absolute; z-index: 100; background: var(--card-bg); border: 1px solid var(--border); width: 250px; max-height: 400px; overflow-y: auto; border-radius: 8px; box-shadow: 0 10px 20px rgba(0,0,0,0.4); }
+        .clickable-row:hover { background: var(--hover); cursor: pointer; }
+        
+        /* Insight Badges */
+        .badge { padding: 3px 7px; border-radius: 4px; font-size: 10px; font-weight: bold; margin-right: 5px; display: inline-block; }
+        .badge-new { background: #1a73e8; color: white; }
+        .badge-value { background: var(--success); color: #000; }
+        .badge-drop { background: var(--warn); color: #000; }
+        
+        input[type="text"], .btn-ui { background: #2d2e31; border: 1px solid var(--border); color: white; padding: 12px; border-radius: 8px; width: 100%; box-sizing: border-box; cursor: pointer; }
+        .hot-toggle { background: #3c4043; display: flex; align-items: center; justify-content: center; gap: 8px; font-weight: bold; }
+        .hot-active { border: 2px solid var(--primary); background: rgba(138, 180, 248, 0.1); }
+        .dropdown-content { display: none; position: absolute; z-index: 100; background: var(--card-bg); border: 1px solid var(--border); width: 250px; max-height: 400px; overflow-y: auto; border-radius: 8px; }
         .dropdown-content.show { display: block; }
-        .toggle-btn { background: #3c4043; color: white; border: none; padding: 5px 10px; border-radius: 4px; font-size: 10px; cursor: pointer; flex: 1; }
-        input[type="text"] { background: #2d2e31; border: 1px solid var(--border); color: white; padding: 12px; border-radius: 8px; width: 100%; box-sizing: border-box; }
-        .listing-link { color: var(--primary); text-decoration: none; font-weight: bold; }
-        .status-badge { padding: 2px 8px; border-radius: 4px; font-size: 10px; font-weight: bold; background: #3c4043; }
-        .sort-icon { font-size: 10px; margin-left: 5px; opacity: 0.5; }
     </style>
 </head>
 <body>
     <div class="container">
         <header style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
             <h1>DVC Market Intelligence <small style="color:var(--primary); font-size: 12px;">PRO 2026</small></h1>
-            <button onclick="window.location.reload()" style="background:none; border:1px solid var(--border); color:white; padding:8px 16px; border-radius:8px; cursor:pointer;">🔄 Refresh</button>
+            <div style="display:flex; gap:10px;">
+                <button class="btn-ui hot-toggle" id="hotBtn" onclick="toggleHotFilter()" style="width:180px;">🔥 Alerts Only</button>
+                <button class="btn-ui" onclick="window.location.reload()" style="width:100px;">🔄 Refresh</button>
+            </div>
         </header>
 
         <div class="controls">
             <div style="position:relative;">
-                <button onclick="document.getElementById('resortDropdown').classList.toggle('show')" style="width:100%; padding:12px; background:#2d2e31; color:white; border:1px solid var(--border); border-radius:8px; cursor:pointer; text-align: left;">Resort Filter ▼</button>
+                <button onclick="document.getElementById('resortDropdown').classList.toggle('show')" class="btn-ui" style="text-align: left;">Resort Filter ▼</button>
                 <div id="resortDropdown" class="dropdown-content"></div>
             </div>
-            <input type="text" id="searchInput" placeholder="Search by ID or Resort..." onkeyup="updateDashboard()">
+            <input type="text" id="searchInput" placeholder="Search Listings..." onkeyup="updateDashboard()">
+            <div id="marketStatus" style="display:flex; align-items:center; color:var(--text-sub); font-size:12px;"></div>
         </div>
 
         <div class="chart-grid">
-            <div class="card chart-box"><strong>Active Listings Trend</strong><canvas id="inventoryChart"></canvas></div>
-            <div class="card chart-box"><strong>Price Momentum ($/Pt)</strong><canvas id="priceChart"></canvas></div>
+            <div class="card chart-box"><strong>Inventory Trend</strong><canvas id="inventoryChart"></canvas></div>
+            <div class="card chart-box"><strong>Price Momentum</strong><canvas id="priceChart"></canvas></div>
         </div>
 
         <div class="card">
-            <strong>Market Analytics Summary</strong> <small style="color:var(--text-sub)">(Click row to toggle focus)</small>
+            <strong>Market Analytics Summary</strong>
             <table>
                 <thead>
                     <tr><th>Resort</th><th>Qty</th><th>Avg $/Pt</th><th>Median $/Pt</th><th>Avg Size</th><th>7d Change</th></tr>
@@ -61,15 +67,15 @@
         </div>
 
         <div class="card">
-            <strong>Live Listing Feed</strong>
-            <table>
+            <strong>Live Insights Feed</strong>
+            <table id="listingTable">
                 <thead>
                     <tr>
-                        <th onclick="sortFeed('listing_id')">ID <span id="sort_listing_id" class="sort-icon"></span></th>
-                        <th onclick="sortFeed('resort')">Resort <span id="sort_resort" class="sort-icon"></span></th>
-                        <th onclick="sortFeed('points')">Points <span id="sort_points" class="sort-icon"></span></th>
-                        <th onclick="sortFeed('price_per_point')">Price/Pt <span id="sort_price_per_point" class="sort-icon"></span></th>
-                        <th>Status</th>
+                        <th onclick="sortFeed('listing_id')">ID</th>
+                        <th onclick="sortFeed('resort')">Resort</th>
+                        <th onclick="sortFeed('points')">Points</th>
+                        <th onclick="sortFeed('price_per_point')">Price/Pt</th>
+                        <th>Insights</th>
                     </tr>
                 </thead>
                 <tbody id="listingBody"></tbody>
@@ -80,7 +86,8 @@
     <script>
         let fullData = [], inventoryChart, priceChart;
         let currentSort = { column: 'listing_id', direction: 'asc' };
-        let lastFilteredData = [];
+        let showHotOnly = false;
+        let resortMedians = {};
 
         Papa.parse('./data/listings_history.csv', {
             download: true, header: true, skipEmptyLines: true,
@@ -91,15 +98,21 @@
             }
         });
 
+        function toggleHotFilter() {
+            showHotOnly = !showHotOnly;
+            document.getElementById('hotBtn').classList.toggle('hot-active');
+            updateDashboard();
+        }
+
         function initResortFilter() {
             const container = document.getElementById('resortDropdown');
             const resorts = [...new Set(fullData.map(d => d.resort))].filter(r => r).sort();
             let html = `<div style="padding:10px; display:flex; gap:5px; border-bottom:1px solid var(--border);">
-                <button class="toggle-btn" onclick="toggleAll(true)">Select All</button>
-                <button class="toggle-btn" onclick="toggleAll(false)">Deselect All</button>
+                <button onclick="toggleAll(true)" style="flex:1">All</button>
+                <button onclick="toggleAll(false)" style="flex:1">None</button>
             </div>`;
             html += resorts.map(r => `
-                <label style="display:block; padding:10px; cursor:pointer; border-bottom:1px solid var(--border);">
+                <label style="display:block; padding:10px; cursor:pointer; border-bottom: 1px solid var(--border);">
                     <input type="checkbox" class="res-chk" value="${r}" checked onchange="updateDashboard()"> ${r}
                 </label>`).join('');
             container.innerHTML = html;
@@ -109,91 +122,95 @@
 
         window.updateDashboard = function(clickedResort = null) {
             const checkboxes = document.querySelectorAll('.res-chk');
-            let selected;
-
             if (clickedResort) {
-                const currentSelected = Array.from(checkboxes).filter(c => c.checked).map(c => c.value);
-                if (currentSelected.length === 1 && currentSelected[0] === clickedResort) {
-                    checkboxes.forEach(c => c.checked = true);
-                } else {
-                    checkboxes.forEach(c => c.checked = (c.value === clickedResort));
-                }
+                const sel = Array.from(checkboxes).filter(c => c.checked).map(c => c.value);
+                if (sel.length === 1 && sel[0] === clickedResort) checkboxes.forEach(c => c.checked = true);
+                else checkboxes.forEach(c => c.checked = (c.value === clickedResort));
             }
 
-            selected = Array.from(document.querySelectorAll('.res-chk:checked')).map(c => c.value);
+            const selected = Array.from(document.querySelectorAll('.res-chk:checked')).map(c => c.value);
             const search = document.getElementById('searchInput').value.toLowerCase();
             const dates = [...new Set(fullData.map(d => d.date))].sort();
             const latestDt = dates[dates.length - 1];
+            const historicalDt = dates[dates.length - 8] || dates[0];
 
             const latestData = fullData.filter(d => d.date === latestDt && selected.includes(d.resort));
-            lastFilteredData = latestData.filter(d => d.resort.toLowerCase().includes(search) || d.listing_id.toLowerCase().includes(search));
+            
+            // Calculate Medians for Value detection
+            resortMedians = {};
+            selected.forEach(r => {
+                const prices = latestData.filter(d => d.resort === r).map(d => parseFloat(d.price_per_point.replace(/[$,]/g,''))).sort((a,b)=>a-b);
+                if(prices.length) resortMedians[r] = prices[Math.floor(prices.length/2)];
+            });
 
-            renderSummary(latestData, selected);
-            sortFeed(currentSort.column, true); // Re-render feed with current sort
+            const processedData = latestData.map(item => {
+                const prevEntries = fullData.filter(d => d.listing_id === item.listing_id && d.date !== latestDt);
+                const isNew = !fullData.some(d => d.listing_id === item.listing_id && d.date === historicalDt);
+                const currentPrice = parseFloat(item.price_per_point.replace(/[$,]/g,''));
+                const median = resortMedians[item.resort] || 999;
+                
+                let priceDrop = false;
+                if(prevEntries.length) {
+                    const oldPrice = parseFloat(prevEntries[0].price_per_point.replace(/[$,]/g,''));
+                    if(currentPrice < oldPrice) priceDrop = true;
+                }
+
+                return { ...item, isNew, isValue: currentPrice < (median * 0.92), priceDrop, currentPrice };
+            });
+
+            let filtered = processedData.filter(d => d.resort.toLowerCase().includes(search) || d.listing_id.toLowerCase().includes(search));
+            if (showHotOnly) filtered = filtered.filter(d => d.isNew || d.isValue || d.priceDrop);
+
+            renderSummary(latestData, selected, historicalDt);
+            renderFeed(filtered);
             renderCharts(fullData.filter(d => selected.includes(d.resort)), dates, selected);
         };
 
-        function sortFeed(col, refreshOnly = false) {
-            if (!refreshOnly) {
-                currentSort.direction = (currentSort.column === col && currentSort.direction === 'asc') ? 'desc' : 'asc';
-                currentSort.column = col;
-            }
-
-            // Update Sort Icons
-            document.querySelectorAll('.sort-icon').forEach(span => span.innerText = '');
-            document.getElementById(`sort_${col}`).innerText = currentSort.direction === 'asc' ? ' ▲' : ' ▼';
-
-            lastFilteredData.sort((a, b) => {
-                let valA = a[col], valB = b[col];
-                
-                // Clean numeric strings for comparison
-                if (col === 'points' || col === 'price_per_point') {
-                    valA = parseFloat(valA.replace(/[$,]/g, '')) || 0;
-                    valB = parseFloat(valB.replace(/[$,]/g, '')) || 0;
-                }
-
-                if (valA < valB) return currentSort.direction === 'asc' ? -1 : 1;
-                if (valA > valB) return currentSort.direction === 'asc' ? 1 : -1;
-                return 0;
+        function renderFeed(data) {
+            data.sort((a, b) => {
+                const valA = a[currentSort.column], valB = b[currentSort.column];
+                return currentSort.direction === 'asc' ? (valA > valB ? 1 : -1) : (valA < valB ? 1 : -1);
             });
 
-            renderFeed(lastFilteredData);
+            document.getElementById('listingBody').innerHTML = data.slice(0, 100).map(i => `
+                <tr class="clickable-row">
+                    <td><a href="https://www.dvcresalemarket.com/listings/listing-${i.listing_id.replace(/\D/g,'')}/" target="_blank" style="color:var(--primary)">${i.listing_id}</a></td>
+                    <td>${i.resort}</td>
+                    <td>${i.points}</td>
+                    <td style="${i.priceDrop ? 'color:var(--warn); font-weight:bold' : ''}">${i.price_per_point}</td>
+                    <td>
+                        ${i.isNew ? '<span class="badge badge-new">NEW</span>' : ''}
+                        ${i.isValue ? '<span class="badge badge-value">VALUE</span>' : ''}
+                        ${i.priceDrop ? '<span class="badge badge-drop">DROP</span>' : ''}
+                    </td>
+                </tr>
+            `).join('');
         }
 
-        function renderSummary(data, selected) {
+        function renderSummary(data, selected, histDt) {
             const body = document.getElementById('summaryBody');
-            const allDates = [...new Set(fullData.map(d => d.date))].sort();
-            const prevDt = allDates[allDates.length - 8] || allDates[0];
-
             body.innerHTML = selected.map(resort => {
                 const resList = data.filter(d => d.resort === resort);
                 if (!resList.length) return '';
                 const p = resList.map(d => parseFloat(d.price_per_point.replace(/[$,]/g,''))).sort((a,b)=>a-b);
                 const pts = resList.map(d => parseInt(d.points));
-                const avg = p.reduce((a,b)=>a+b,0)/p.length;
-                const med = p.length % 2 !== 0 ? p[Math.floor(p.length/2)] : (p[p.length/2-1]+p[p.length/2])/2;
-                const size = pts.reduce((a,b)=>a+b,0)/pts.length;
-                const histCount = fullData.filter(d => d.date === prevDt && d.resort === resort).length;
+                const med = p[Math.floor(p.length/2)];
+                const histCount = fullData.filter(d => d.date === histDt && d.resort === resort).length;
                 const delta = resList.length - histCount;
 
-                return `<tr class="clickable-row ${selected.length === 1 ? 'active-filter' : ''}" onclick="updateDashboard('${resort}')">
+                return `<tr class="clickable-row" onclick="updateDashboard('${resort}')">
                     <td><strong>${resort}</strong></td><td>${resList.length}</td>
-                    <td>$${avg.toFixed(2)}</td><td>$${med.toFixed(2)}</td><td>${Math.round(size)} pts</td>
-                    <td style="color:${delta >= 0 ? '#81c995' : '#f28b82'}">${delta >= 0 ? '+' : ''}${delta}</td>
+                    <td>$${(p.reduce((a,b)=>a+b,0)/p.length).toFixed(2)}</td><td>$${med.toFixed(2)}</td>
+                    <td>${Math.round(pts.reduce((a,b)=>a+b,0)/pts.length)} pts</td>
+                    <td style="color:${delta >= 0 ? 'var(--success)' : 'var(--danger)'}">${delta >= 0 ? '+' : ''}${delta}</td>
                 </tr>`;
             }).join('');
         }
 
-        function renderFeed(data) {
-            document.getElementById('listingBody').innerHTML = data.slice(0, 50).map(i => `
-                <tr>
-                    <td><a href="https://www.dvcresalemarket.com/listings/listing-${i.listing_id.replace(/\D/g,'')}/" target="_blank" class="listing-link">${i.listing_id}</a></td>
-                    <td>${i.resort}</td>
-                    <td>${i.points}</td>
-                    <td>${i.price_per_point}</td>
-                    <td><span class="status-badge">${i.status || 'Active'}</span></td>
-                </tr>
-            `).join('');
+        function sortFeed(col) {
+            currentSort.direction = (currentSort.column === col && currentSort.direction === 'asc') ? 'desc' : 'asc';
+            currentSort.column = col;
+            updateDashboard();
         }
 
         function renderCharts(data, dates, selected) {
@@ -201,26 +218,22 @@
             if (priceChart) priceChart.destroy();
             const colors = ['#8ab4f8', '#81c995', '#fdd663', '#f28b82', '#c58af9'];
             
-            const datasets = selected.slice(0,5).map((r, i) => ({
-                label: r, data: dates.map(dt => data.filter(d => d.date === dt && d.resort === r).length),
-                borderColor: colors[i], tension: 0.4, fill: false
-            }));
-
             inventoryChart = new Chart(document.getElementById('inventoryChart'), {
-                type: 'line', data: { labels: dates, datasets: datasets },
-                options: { maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } } }
+                type: 'line', data: { labels: dates, datasets: selected.slice(0,5).map((r, i) => ({
+                    label: r, data: dates.map(dt => data.filter(d => d.date === dt && d.resort === r).length),
+                    borderColor: colors[i], tension: 0.4, fill: false
+                }))},
+                options: { maintainAspectRatio: false }
             });
 
-            const priceDatasets = selected.slice(0,5).map((r, i) => ({
-                label: r, data: dates.map(dt => {
-                    const d = data.filter(x => x.date === dt && x.resort === r);
-                    return d.length ? (d.reduce((s,c)=>s+parseFloat(c.price_per_point.replace(/[$,]/g,'')),0)/d.length).toFixed(2) : null;
-                }), borderColor: colors[i], borderDash: [5,5], tension: 0.1
-            }));
-
             priceChart = new Chart(document.getElementById('priceChart'), {
-                type: 'line', data: { labels: dates, datasets: priceDatasets },
-                options: { maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } } }
+                type: 'line', data: { labels: dates, datasets: selected.slice(0,5).map((r, i) => ({
+                    label: r, data: dates.map(dt => {
+                        const d = data.filter(x => x.date === dt && x.resort === r);
+                        return d.length ? (d.reduce((s,c)=>s+parseFloat(c.price_per_point.replace(/[$,]/g,'')),0)/d.length).toFixed(2) : null;
+                    }), borderColor: colors[i], borderDash: [5,5], tension: 0.1
+                }))},
+                options: { maintainAspectRatio: false }
             });
         }
 
