@@ -180,26 +180,37 @@
         }
 
         // 3. AI SUMMARY LOGIC
-        window.generateAISummary = async function() {
-            const btn = document.getElementById('aiBtn');
-            const content = document.getElementById('aiContent');
-            btn.disabled = true;
-            content.innerText = "Processing market signals via Gemini 3.0 Flash...";
+window.generateAISummary = async function() {
+    const btn = document.getElementById('aiBtn');
+    const content = document.getElementById('aiContent');
+    btn.disabled = true;
+    content.innerText = "Analyzing 2026 market trends...";
 
-            try {
-                const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" }); // Defaulting to 1.5-flash if 2.5 is regional
-                const tableText = Array.from(document.querySelectorAll('#summaryBody tr')).map(tr => tr.innerText).join('\n');
-                const prompt = `Act as a DVC resale analyst. Looking at this data, give 3 short bullet points on which resorts are the best 'buys' right now based on price and inventory. Data:\n${tableText}`;
-                
-                const result = await model.generateContent(prompt);
-                content.innerHTML = result.response.text().replace(/\n/g, '<br>');
-            } catch (err) {
-                content.innerText = "AI Error: Check console for details. (404 usually means model name mismatch)";
-                console.error(err);
-            } finally {
-                btn.disabled = false;
-            }
-        };
+    // Try Gemini 2.5 Flash (Current 2026 Standard)
+    // If that fails, it falls back to Gemini 3 Flash
+    const modelNames = ["gemini-2.5-flash", "gemini-3-flash"];
+    
+    for (let modelName of modelNames) {
+        try {
+            const model = genAI.getGenerativeModel({ model: modelName });
+            const tableText = Array.from(document.querySelectorAll('#summaryBody tr'))
+                                .map(tr => tr.innerText).join('\n');
+            
+            const prompt = `Act as a DVC resale expert. Based on this data, give 3 bullet points on the best 'buys' right now. Focus on price and inventory. Data:\n${tableText}`;
+            
+            const result = await model.generateContent(prompt);
+            const response = await result.response;
+            content.innerHTML = response.text().replace(/\n/g, '<br>').replace(/\*\*/g, '');
+            btn.disabled = false;
+            return; // Exit if successful
+        } catch (err) {
+            console.warn(`Model ${modelName} failed, trying next...`, err);
+        }
+    }
+
+    content.innerHTML = `<span style="color:#f28b82">AI Error: All models failed. Please ensure your API Key in Google AI Studio is not restricted to a specific project.</span>`;
+    btn.disabled = false;
+};
     </script>
 </body>
 </html>
