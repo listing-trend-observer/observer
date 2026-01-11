@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="referrer" content="no-referrer">
-    <title>DVC Intel | Ultimate Tracker</title>
+    <title>DVC Market Intelligence</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
     <style>
@@ -18,56 +18,58 @@
             --primary: #8ab4f8; --border: #3c4043; --hover: #2d2e31; --shadow: 0 4px 6px rgba(0,0,0,0.3);
             --success: #81c995; --warning: #f28b82;
         }
-        body { font-family: 'Segoe UI', system-ui, sans-serif; margin: 0; padding: 20px; background: var(--bg); color: var(--text); }
+        body { font-family: 'Segoe UI', system-ui, sans-serif; margin: 0; padding: 20px; background: var(--bg); color: var(--text); line-height: 1.5; }
         .container { max-width: 1600px; margin: auto; }
         
         header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
         .controls { display: grid; grid-template-columns: 1fr 2fr; gap: 16px; margin-bottom: 20px; }
         
-        /* Main Dashboard Grid */
-        .dash-row { display: grid; grid-template-columns: 1.5fr 1fr 1fr; gap: 16px; margin-bottom: 20px; }
-        .card { background: var(--card-bg); padding: 16px; border-radius: 12px; border: 1px solid var(--border); box-shadow: var(--shadow); }
-        .label { font-size: 11px; font-weight: 700; color: var(--text-sub); text-transform: uppercase; margin-bottom: 12px; display: block; }
+        .card { background: var(--card-bg); padding: 20px; border-radius: 12px; border: 1px solid var(--border); box-shadow: var(--shadow); margin-bottom: 20px; }
+        .label { font-size: 11px; font-weight: 700; color: var(--text-sub); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 15px; display: block; }
 
-        /* Summary & Chart Heights */
-        .summary-container { height: 350px; overflow-y: auto; }
-        .chart-container { height: 350px; }
+        /* Summary Table Height */
+        .summary-wrapper { max-height: 300px; overflow-y: auto; }
+        .summary-table { width: 100%; border-collapse: collapse; }
+        .summary-table th { text-align: left; color: var(--text-sub); border-bottom: 2px solid var(--border); padding: 10px; font-size: 11px; position: sticky; top: 0; background: var(--card-bg); }
+        .summary-table td { padding: 12px 10px; border-bottom: 1px solid var(--border); font-size: 14px; font-weight: 500; }
 
-        .summary-table { width: 100%; border-collapse: collapse; font-size: 13px; }
-        .summary-table th { text-align: left; color: var(--text-sub); border-bottom: 1px solid var(--border); padding: 8px; font-size: 10px; }
-        .summary-table td { padding: 10px 8px; border-bottom: 1px solid var(--border); }
+        /* Side-by-Side Charts */
+        .chart-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px; }
+        .chart-box { height: 350px; }
 
-        /* Dropdown & Inputs */
+        /* Form Elements */
         .dropdown-container { position: relative; }
-        .multiselect-btn { padding: 12px; border-radius: 8px; border: 1px solid var(--border); background: var(--card-bg); color: var(--text); cursor: pointer; display: flex; justify-content: space-between; }
-        .dropdown-content { display: none; position: absolute; z-index: 100; width: 100%; background: var(--card-bg); border: 1px solid var(--border); border-radius: 8px; max-height: 400px; overflow-y: auto; margin-top: 4px; }
+        .multiselect-btn { padding: 12px; border-radius: 8px; border: 1px solid var(--border); background: var(--card-bg); color: var(--text); cursor: pointer; display: flex; justify-content: space-between; font-weight: 500; }
+        .dropdown-content { display: none; position: absolute; z-index: 100; width: 100%; background: var(--card-bg); border: 1px solid var(--border); border-radius: 8px; max-height: 400px; overflow-y: auto; margin-top: 4px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
         .dropdown-content.show { display: block; }
         .bulk-actions { display: flex; gap: 10px; padding: 10px; border-bottom: 1px solid var(--border); background: var(--card-bg); position: sticky; top: 0; }
-        .bulk-btn { flex: 1; padding: 4px; font-size: 10px; cursor: pointer; border-radius: 4px; border: 1px solid var(--primary); background: transparent; color: var(--primary); font-weight: bold; }
-        .resort-option { display: block; padding: 8px 12px; cursor: pointer; font-size: 13px; }
-        input[type="text"] { padding: 12px; border-radius: 8px; border: 1px solid var(--border); background: var(--card-bg); color: var(--text); width: 100%; box-sizing: border-box; }
+        .bulk-btn { flex: 1; padding: 6px; font-size: 11px; cursor: pointer; border-radius: 4px; border: 1px solid var(--primary); background: transparent; color: var(--primary); font-weight: bold; }
+        .resort-option { display: block; padding: 10px 12px; cursor: pointer; font-size: 14px; }
+        input[type="text"] { padding: 12px; border-radius: 8px; border: 1px solid var(--border); background: var(--card-bg); color: var(--text); width: 100%; box-sizing: border-box; font-size: 14px; }
 
         /* Feed Table */
         .feed-table { width: 100%; border-collapse: collapse; }
         .feed-table th { text-align: left; padding: 12px; font-size: 11px; color: var(--text-sub); border-bottom: 2px solid var(--border); cursor: pointer; }
-        .feed-table td { padding: 12px; border-bottom: 1px solid var(--border); font-size: 14px; }
-        
-        .trend-up { color: var(--warning); }
-        .trend-down { color: var(--success); }
+        .feed-table td { padding: 14px 12px; border-bottom: 1px solid var(--border); font-size: 14px; }
+        tr:hover { background: var(--hover); }
+
+        .trend-up { color: var(--warning); font-size: 11px; }
+        .trend-down { color: var(--success); font-size: 11px; }
         .listing-link { color: var(--primary); text-decoration: none; font-weight: 600; }
+        .badge-new { color: var(--primary); font-size: 10px; font-weight: 900; }
     </style>
 </head>
 <body>
     <div class="container">
         <header>
-            <h1>DVC Market Intelligence</h1>
-            <button onclick="document.documentElement.setAttribute('data-theme', document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark')" style="cursor:pointer; background:none; border:1px solid var(--border); color:var(--text); padding:8px 12px; border-radius:8px;">🌓 Toggle Theme</button>
+            <h1 style="font-size: 24px;">DVC Market Intelligence</h1>
+            <button onclick="document.documentElement.setAttribute('data-theme', document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark')" style="cursor:pointer; background:none; border:1px solid var(--border); color:var(--text); padding:8px 16px; border-radius:8px; font-weight: 600;">🌓 Toggle Theme</button>
         </header>
 
         <div class="controls">
             <div class="dropdown-container">
                 <div class="multiselect-btn" onclick="document.getElementById('resortDropdown').classList.toggle('show')">
-                    <span id="selectedCount">All Resorts</span> <span>▼</span>
+                    <span id="selectedCount">Loading...</span> <span>▼</span>
                 </div>
                 <div id="resortDropdown" class="dropdown-content">
                     <div class="bulk-actions">
@@ -80,16 +82,16 @@
             <input type="text" id="searchInput" placeholder="Search by ID, Resort, or Points..." onkeyup="updateDashboard()">
         </div>
 
-        <div class="dash-row">
-            <div class="card summary-container">
-                <span class="label">Resort Summary (7-Day Velocity)</span>
+        <div class="card">
+            <span class="label">Resort Summary (Market Averages & 7-Day Velocity)</span>
+            <div class="summary-wrapper">
                 <table class="summary-table">
                     <thead>
                         <tr>
                             <th>Resort</th>
-                            <th>Qty</th>
-                            <th>Avg $/Pt</th>
-                            <th>Avg Days</th>
+                            <th>Active Contracts</th>
+                            <th>Avg Price / Pt</th>
+                            <th>Avg Days on Market</th>
                             <th>New (7d)</th>
                             <th>Sold (7d)</th>
                         </tr>
@@ -97,14 +99,15 @@
                     <tbody id="summaryBody"></tbody>
                 </table>
             </div>
+        </div>
 
-            <div class="card chart-container">
-                <span class="label">Inventory Trend</span>
+        <div class="chart-grid">
+            <div class="card chart-box">
+                <span class="label">Inventory Levels</span>
                 <canvas id="inventoryChart"></canvas>
             </div>
-
-            <div class="card chart-container">
-                <span class="label">Price Trend ($/Pt)</span>
+            <div class="card chart-box">
+                <span class="label">Price Trends ($/Pt)</span>
                 <canvas id="priceTrendChart"></canvas>
             </div>
         </div>
@@ -119,7 +122,7 @@
                         <th onclick="handleSort('points')">Points</th>
                         <th onclick="handleSort('price_per_point')">Price/Pt</th>
                         <th onclick="handleSort('days')">Days</th>
-                        <th>Analysis</th>
+                        <th>Status</th>
                     </tr>
                 </thead>
                 <tbody id="listingBody"></tbody>
@@ -131,6 +134,8 @@
         let fullData = [], inventoryChart, priceTrendChart;
         let currentSort = { col: 'price_per_point', dir: 'asc' };
         const slugs = {"Animal Kingdom": "animal-kingdom-lodge", "Aulani": "aulani-disney-resort", "Bay Lake Tower": "bay-lake-tower", "Beach Club": "beach-club-villas", "BoardWalk": "boardwalk-villas", "Boulder Ridge": "boulder-ridge-villas", "Copper Creek": "copper-creek-villas", "Grand Californian": "grand-californian", "Grand Floridian": "grand-floridian", "Hilton Head": "hilton-head", "Old Key West": "old-key-west", "Polynesian": "polynesian", "Riviera": "riviera-resort", "Saratoga Springs": "saratoga-springs", "Vero Beach": "vero-beach"};
+
+        window.onclick = e => { if (!e.target.closest('.dropdown-container')) document.getElementById('resortDropdown').classList.remove('show'); }
 
         Papa.parse('./data/listings_history.csv', {
             download: true, header: true,
@@ -212,11 +217,11 @@
             if (inventoryChart) inventoryChart.destroy();
             if (priceTrendChart) priceTrendChart.destroy();
             const colors = ['#8ab4f8','#81c995','#fdd663','#f28b82','#c58af9'];
-            const commonOpt = { maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { display: false }, y: { ticks: { font: { size: 9 } } } } };
+            const commonOpt = { maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { display: true }, y: { ticks: { font: { size: 9 } } } } };
 
             inventoryChart = new Chart(document.getElementById('inventoryChart'), {
                 type: 'line',
-                data: { labels: dates, datasets: selected.slice(0,5).map((r, i) => ({ label: r, data: dates.map(dt => data.filter(d => d.date === dt && d.resort === r).length), borderColor: colors[i], tension: 0.3, pointRadius: 0 })) },
+                data: { labels: dates, datasets: selected.slice(0,5).map((r, i) => ({ label: r, data: dates.map(dt => data.filter(d => d.date === dt && d.resort === r).length), borderColor: colors[i % 5], tension: 0.3, pointRadius: 0 })) },
                 options: commonOpt
             });
 
@@ -225,7 +230,7 @@
                 data: { labels: dates, datasets: selected.slice(0,5).map((r, i) => ({ label: r, data: dates.map(dt => {
                     const day = data.filter(d => d.date === dt && d.resort === r);
                     return day.length ? (day.reduce((s, d) => s + parseFloat(d.price_per_point.replace('$','')), 0) / day.length).toFixed(2) : null;
-                }), borderColor: colors[i], borderDash: [5, 5], tension: 0.3, pointRadius: 2 })) },
+                }), borderColor: colors[i % 5], borderDash: [5, 5], tension: 0.3, pointRadius: 2 })) },
                 options: commonOpt
             });
         }
@@ -245,7 +250,7 @@
                     <td style="font-family:monospace; color:var(--text-sub);">${item.listing_id}</td>
                     <td><a href="https://www.dvcresalemarket.com/listings/${slugs[item.resort] || ''}/${item.listing_id.toLowerCase().trim()}/" target="_blank" rel="noreferrer" class="listing-link">${item.resort}</a></td>
                     <td>${item.points}</td><td>${item.price_per_point}</td><td>${days}</td>
-                    <td>${days <= 1 ? '<span style="color:var(--primary); font-size:10px; font-weight:bold;">NEW</span>' : ''}</td>
+                    <td>${days <= 1 ? '<span class="badge-new">NEW</span>' : ''}</td>
                 </tr>`;
             });
         }
