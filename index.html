@@ -18,10 +18,9 @@
             --primary: #8ab4f8; --border: #3c4043; --hover: #2d2e31; --shadow: 0 4px 6px rgba(0,0,0,0.3);
             --success: #81c995; --warning: #f28b82;
         }
-        body { font-family: 'Google Sans', 'Segoe UI', sans-serif; margin: 0; padding: 20px; background: var(--bg); color: var(--text); }
+        body { font-family: 'Segoe UI', system-ui, sans-serif; margin: 0; padding: 20px; background: var(--bg); color: var(--text); }
         .container { max-width: 1400px; margin: auto; }
         
-        /* Dashboard Layout */
         header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
         .controls { display: grid; grid-template-columns: 1fr 2fr; gap: 16px; margin-bottom: 24px; }
         .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 24px; }
@@ -30,17 +29,31 @@
         .metric { font-size: 32px; font-weight: 500; color: var(--primary); margin: 8px 0; }
         .label { font-size: 12px; font-weight: 700; color: var(--text-sub); text-transform: uppercase; letter-spacing: 0.5px; }
 
-        /* Multi-select Dropdown */
+        /* Enhanced Multi-select Dropdown */
         .dropdown-container { position: relative; }
         .multiselect-btn { padding: 12px; border-radius: 8px; border: 1px solid var(--border); background: var(--card-bg); color: var(--text); cursor: pointer; display: flex; justify-content: space-between; }
-        .dropdown-content { display: none; position: absolute; z-index: 100; width: 100%; background: var(--card-bg); border: 1px solid var(--border); border-radius: 8px; max-height: 300px; overflow-y: auto; margin-top: 4px; box-shadow: var(--shadow); }
-        .dropdown-content label { display: block; padding: 8px 12px; cursor: pointer; }
-        .dropdown-content label:hover { background: var(--hover); }
-        .show { display: block; }
+        .dropdown-content { display: none; position: absolute; z-index: 100; width: 100%; background: var(--card-bg); border: 1px solid var(--border); border-radius: 8px; max-height: 400px; overflow-y: auto; margin-top: 4px; box-shadow: var(--shadow); }
+        .dropdown-content.show { display: block; }
+
+        /* Bulk Selection Bar */
+        .bulk-actions { 
+            display: flex; gap: 10px; padding: 10px; 
+            border-bottom: 1px solid var(--border); 
+            position: sticky; top: 0; background: var(--card-bg);
+        }
+        .bulk-btn { 
+            flex: 1; padding: 6px; font-size: 11px; font-weight: bold; 
+            text-transform: uppercase; cursor: pointer; border-radius: 4px;
+            border: 1px solid var(--primary); background: transparent; color: var(--primary);
+        }
+        .bulk-btn:hover { background: var(--primary); color: white; }
+
+        .resort-option { display: block; padding: 10px 12px; cursor: pointer; font-size: 14px; }
+        .resort-option:hover { background: var(--hover); }
+        .resort-option input { margin-right: 10px; }
 
         input[type="text"] { padding: 12px; border-radius: 8px; border: 1px solid var(--border); background: var(--card-bg); color: var(--text); width: 100%; box-sizing: border-box; }
 
-        /* Table Styling */
         table { width: 100%; border-collapse: collapse; }
         th { text-align: left; padding: 12px; font-size: 12px; color: var(--text-sub); border-bottom: 2px solid var(--border); cursor: pointer; }
         td { padding: 16px 12px; border-bottom: 1px solid var(--border); font-size: 14px; }
@@ -48,26 +61,27 @@
 
         .listing-link { color: var(--primary); text-decoration: none; font-weight: 500; }
         .value-good { color: var(--success); font-weight: bold; }
-        .value-high { color: var(--warning); }
-        
         .badge { padding: 4px 8px; border-radius: 6px; font-size: 11px; font-weight: 700; display: inline-block; }
         .badge-deal { background: rgba(24, 128, 56, 0.15); color: var(--success); }
-        .badge-new { background: rgba(26, 115, 232, 0.15); color: var(--primary); }
     </style>
 </head>
 <body>
     <div class="container">
         <header>
             <h1>DVC Market Intelligence</h1>
-            <button onclick="document.documentElement.setAttribute('data-theme', document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark')" style="cursor:pointer; background:none; border:1px solid var(--border); color:var(--text); padding:8px 12px; border-radius:8px;">🌓 Toggle</button>
+            <button onclick="document.documentElement.setAttribute('data-theme', document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark')" style="cursor:pointer; background:none; border:1px solid var(--border); color:var(--text); padding:8px 12px; border-radius:8px;">🌓 Toggle Theme</button>
         </header>
 
         <div class="controls">
             <div class="dropdown-container">
-                <div class="multiselect-btn" onclick="document.getElementById('resortDropdown').classList.toggle('show')">
+                <div class="multiselect-btn" onclick="toggleDropdown()">
                     <span id="selectedCount">All Resorts</span> <span>▼</span>
                 </div>
                 <div id="resortDropdown" class="dropdown-content">
+                    <div class="bulk-actions">
+                        <button class="bulk-btn" onclick="bulkToggle(true)">Select All</button>
+                        <button class="bulk-btn" onclick="bulkToggle(false)">Deselect All</button>
+                    </div>
                     <div id="resortOptions"></div>
                 </div>
             </div>
@@ -107,6 +121,15 @@
         let currentSort = { col: 'price_per_point', dir: 'asc' };
         const slugs = {"Animal Kingdom": "animal-kingdom-lodge", "Aulani": "aulani-disney-resort", "Bay Lake Tower": "bay-lake-tower", "Beach Club": "beach-club-villas", "BoardWalk": "boardwalk-villas", "Boulder Ridge": "boulder-ridge-villas", "Copper Creek": "copper-creek-villas", "Grand Californian": "grand-californian", "Grand Floridian": "grand-floridian", "Hilton Head": "hilton-head", "Old Key West": "old-key-west", "Polynesian": "polynesian", "Riviera": "riviera-resort", "Saratoga Springs": "saratoga-springs", "Vero Beach": "vero-beach"};
 
+        function toggleDropdown() { document.getElementById('resortDropdown').classList.toggle('show'); }
+
+        // Close dropdown when clicking outside
+        window.onclick = function(e) {
+            if (!e.target.closest('.dropdown-container')) {
+                document.getElementById('resortDropdown').classList.remove('show');
+            }
+        }
+
         Papa.parse('./data/listings_history.csv', {
             download: true, header: true,
             complete: function(res) {
@@ -120,8 +143,13 @@
             const opts = document.getElementById('resortOptions');
             const unique = [...new Set(fullData.map(d => d.resort))].filter(r => r).sort();
             unique.forEach(r => {
-                opts.innerHTML += `<label><input type="checkbox" class="res-chk" value="${r}" checked onchange="updateDashboard()"> ${r}</label>`;
+                opts.innerHTML += `<label class="resort-option"><input type="checkbox" class="res-chk" value="${r}" checked onchange="updateDashboard()"> ${r}</label>`;
             });
+        }
+
+        function bulkToggle(checkAll) {
+            document.querySelectorAll('.res-chk').forEach(cb => cb.checked = checkAll);
+            updateDashboard();
         }
 
         function handleSort(c) {
@@ -136,7 +164,8 @@
             const dates = [...new Set(fullData.map(d => d.date))].sort();
             const latestDt = dates[dates.length - 1];
 
-            // Calculate Resort Averages for Comparison
+            document.getElementById('selectedCount').innerText = selected.length === 0 ? "No Resorts Selected" : `${selected.length} Resorts Selected`;
+
             const resortAvgMap = {};
             selected.forEach(r => {
                 const rData = fullData.filter(d => d.date === latestDt && d.resort === r);
@@ -169,11 +198,7 @@
                 const rAvg = avgMap[item.resort];
                 const pctDiff = ((price - rAvg) / rAvg) * 100;
                 
-                let analysis = "";
-                if (pctDiff < -5) analysis = `<span class="badge badge-deal">Great Value (${Math.abs(pctDiff).toFixed(1)}% below avg)</span>`;
-                else if (pctDiff > 5) analysis = `<span class="value-high">Above Avg</span>`;
-                else analysis = `<span style="color:var(--text-sub)">Fair Market</span>`;
-
+                let analysis = (pctDiff < -5) ? `<span class="badge badge-deal">Great Value (${Math.abs(pctDiff).toFixed(1)}% below avg)</span>` : `<span style="color:var(--text-sub)">Fair Market</span>`;
                 const url = `https://www.dvcresalemarket.com/listings/${slugs[item.resort] || ''}/${item.listing_id.toLowerCase()}/`;
                 
                 body.innerHTML += `<tr>
@@ -197,7 +222,7 @@
                     datasets: selected.slice(0, 5).map((r, i) => ({
                         label: r,
                         data: dates.map(dt => data.filter(d => d.date === dt && d.resort === r).length),
-                        borderColor: ['#8ab4f8','#81c995','#fdd663','#f28b82','#c58af9'][i],
+                        borderColor: ['#8ab4f8','#81c995','#fdd663','#f28b82','#c58af9'][i % 5],
                         tension: 0.3, pointRadius: 0
                     }))
                 },
