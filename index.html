@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -30,12 +30,11 @@
         }
 
         body { 
-            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; 
+            font-family: 'Segoe UI', system-ui, sans-serif; 
             margin: 0; padding: 20px;
             background: var(--bg);
             color: var(--text);
             transition: background 0.3s ease, color 0.3s ease;
-            line-height: 1.5;
         }
 
         .container { max-width: 1400px; margin: auto; }
@@ -81,26 +80,32 @@
         select {
             padding: 12px; border-radius: 10px; border: 2px solid var(--border);
             background: var(--card-bg); color: var(--text); font-size: 16px; width: 100%;
-            cursor: pointer; outline: none;
         }
 
         table { width: 100%; border-collapse: collapse; margin-top: 15px; }
         th.sortable { 
             text-align: left; font-size: 12px; color: var(--text-sub); 
             padding: 12px; border-bottom: 2px solid var(--border); 
-            cursor: pointer; transition: color 0.2s;
+            cursor: pointer;
         }
         th.sortable:hover { color: var(--primary); }
-        th.sortable::after { content: ' ↕'; opacity: 0.3; font-size: 10px; }
+        th.sortable::after { content: ' ↕'; opacity: 0.3; font-size: 10px; margin-left: 5px; }
         
         td { padding: 15px; border-bottom: 1px solid var(--border); font-size: 14px; }
         tr:hover { background: var(--hover); }
 
+        /* Link Styling */
+        .listing-link {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 600;
+        }
+        .listing-link:hover {
+            text-decoration: underline;
+        }
+
         .badge-new { background: rgba(26, 115, 232, 0.1); color: #1a73e8; padding: 4px 10px; border-radius: 20px; font-size: 10px; font-weight: 800; }
         .badge-drop { background: rgba(217, 48, 37, 0.1); color: #d93025; padding: 4px 10px; border-radius: 20px; font-size: 10px; font-weight: 800; border: 1px solid #d93025; }
-
-        h1 { margin: 0; font-weight: 800; letter-spacing: -1px; }
-        h2 { margin-top: 0; font-size: 18px; }
     </style>
 </head>
 <body>
@@ -130,9 +135,10 @@
 
         <div class="card" style="overflow-x: auto;">
             <h2>Market Feed</h2>
-            <table>
+            <table id="sortableTable">
                 <thead>
                     <tr>
+                        <th class="sortable" onclick="handleSort('listing_id')">ID</th>
                         <th class="sortable" onclick="handleSort('resort')">Resort</th>
                         <th class="sortable" onclick="handleSort('points')">Points</th>
                         <th class="sortable" onclick="handleSort('price_per_point')">Price/Pt</th>
@@ -152,16 +158,13 @@
         const colorPalette = ['#1a73e8', '#34a853', '#fabc05', '#ea4335', '#673ab7', '#ff6d01', '#00bcd4'];
 
         function toggleTheme() {
-            const body = document.body;
-            const theme = body.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
-            body.setAttribute('data-theme', theme);
-            
-            // Update Chart.js defaults for the new theme
+            const html = document.documentElement;
+            const theme = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+            html.setAttribute('data-theme', theme);
             Chart.defaults.color = theme === 'dark' ? '#e8eaed' : '#5f6368';
             updateDashboard(document.getElementById('resortFilter').value);
         }
 
-        // Load Data
         Papa.parse('./data/listings_history.csv', {
             download: true, 
             header: true,
@@ -204,7 +207,6 @@
             const latestListings = filteredData.filter(d => d.date === latestDate);
             const prevListings = filteredData.filter(d => d.date === prevDate);
 
-            // Metrics calculation
             document.getElementById('totalListings').innerText = latestListings.length;
             const avg = latestListings.reduce((s, c) => s + parseFloat(c.price_per_point.replace('$','')), 0) / (latestListings.length || 1);
             document.getElementById('avgPrice').innerText = `$${avg.toFixed(2)}`;
@@ -222,13 +224,14 @@
             if (priceTrendChart) priceTrendChart.destroy();
 
             const resorts = selectedResort === "All" ? [...new Set(data.map(d => d.resort))].filter(r => r) : [selectedResort];
-            const isDark = document.body.getAttribute('data-theme') === 'dark';
+            const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+            Chart.defaults.color = isDark ? '#e8eaed' : '#5f6368';
             
             const commonOptions = {
                 maintainAspectRatio: false,
                 plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, padding: 20 } } },
                 scales: { 
-                    x: { grid: { display: false }, ticks: { maxRotation: 45, minRotation: 45 } }, 
+                    x: { grid: { display: false } }, 
                     y: { grid: { color: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)' } } 
                 }
             };
@@ -246,7 +249,7 @@
                         tension: 0.4
                     }))
                 },
-                options: { ...commonOptions, plugins: { ...commonOptions.plugins, title: { display: true, text: 'Inventory Volume Trend' } } }
+                options: { ...commonOptions, plugins: { ...commonOptions.plugins, title: { display: true, text: 'Inventory Volume' } } }
             });
 
             priceTrendChart = new Chart(document.getElementById('priceTrendChart'), {
@@ -254,7 +257,7 @@
                 data: {
                     labels: dates,
                     datasets: resorts.map((r, i) => ({
-                        label: r + " Avg Price",
+                        label: r,
                         data: dates.map(dt => {
                             const dayData = data.filter(d => d.date === dt && d.resort === r);
                             if (dayData.length === 0) return null;
@@ -266,7 +269,7 @@
                         tension: 0.4
                     }))
                 },
-                options: { ...commonOptions, plugins: { ...commonOptions.plugins, title: { display: true, text: 'Price Per Point History' } } }
+                options: { ...commonOptions, plugins: { ...commonOptions.plugins, title: { display: true, text: 'Avg Price History' } } }
             });
         }
 
@@ -274,7 +277,6 @@
             const body = document.getElementById('listingBody');
             body.innerHTML = "";
 
-            // Custom Sort Engine
             listings.sort((a, b) => {
                 let valA, valB;
                 if (currentSort.column === 'price_per_point') {
@@ -287,13 +289,13 @@
                     valA = fullData.filter(d => d.listing_id === a.listing_id).length;
                     valB = fullData.filter(d => d.listing_id === b.listing_id).length;
                 } else {
-                    valA = a[currentSort.column].toLowerCase();
-                    valB = b[currentSort.column].toLowerCase();
+                    valA = (a[currentSort.column] || "").toString().toLowerCase();
+                    valB = (b[currentSort.column] || "").toString().toLowerCase();
                 }
                 return currentSort.direction === 'asc' ? (valA > valB ? 1 : -1) : (valA < valB ? 1 : -1);
             });
 
-            listings.slice(0, 50).forEach(item => {
+            listings.slice(0, 100).forEach(item => {
                 const daysOnMarket = fullData.filter(d => d.listing_id === item.listing_id).length;
                 let insight = daysOnMarket === 1 ? '<span class="badge-new">NEW</span>' : '';
                 
@@ -304,8 +306,17 @@
                     if (current < old) insight = `<span class="badge-drop">📉 -$${(old - current).toFixed(2)}</span>`;
                 }
 
+                // Create the Hyperlink URL
+                const cleanId = item.listing_id.trim();
+                const listingUrl = `https://www.dvcresalemarket.com/listings/${cleanId}/`;
+
                 body.innerHTML += `<tr>
-                    <td><strong>${item.resort}</strong></td>
+                    <td style="font-family: monospace; font-size: 12px; color: var(--text-sub);">${item.listing_id}</td>
+                    <td>
+                        <a href="${listingUrl}" target="_blank" class="listing-link">
+                            ${item.resort}
+                        </a>
+                    </td>
                     <td>${item.points}</td>
                     <td>${item.price_per_point}</td>
                     <td>${daysOnMarket}</td>
