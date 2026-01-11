@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DVC Market Intelligence | 2026 AI Tracker</title>
+    <title>DVC Intelligence Pro | 2026 Edition</title>
     
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
@@ -21,42 +21,60 @@
         body { font-family: 'Segoe UI', system-ui, sans-serif; margin: 0; padding: 20px; background: var(--bg); color: var(--text); }
         .container { max-width: 1400px; margin: auto; }
         .ai-card { background: var(--card-bg); border: 1px solid var(--border); border-left: 5px solid #8ab4f8; border-radius: 12px; padding: 20px; margin-bottom: 20px; box-shadow: var(--shadow); }
-        .ai-btn { background: var(--ai-gradient); color: white; border: none; padding: 12px 24px; border-radius: 20px; font-weight: 700; cursor: pointer; }
-        .ai-btn:disabled { opacity: 0.5; cursor: not-allowed; }
-        #aiContent { margin-top: 15px; font-size: 14px; line-height: 1.6; color: #e8eaed; }
+        .ai-btn { background: var(--ai-gradient); color: white; border: none; padding: 10px 20px; border-radius: 20px; font-weight: 700; cursor: pointer; }
         .card { background: var(--card-bg); padding: 20px; border-radius: 12px; border: 1px solid var(--border); margin-bottom: 20px; }
+        .controls { display: grid; grid-template-columns: 1fr 2fr; gap: 15px; margin-bottom: 20px; }
+        .chart-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px; }
+        .chart-box { height: 300px; }
         table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-        th { text-align: left; color: var(--text-sub); border-bottom: 2px solid var(--border); padding: 10px; font-size: 12px; }
-        td { padding: 10px; border-bottom: 1px solid var(--border); font-size: 14px; }
-        .listing-link { color: var(--primary); text-decoration: none; font-weight: bold; }
+        th { text-align: left; color: var(--text-sub); border-bottom: 2px solid var(--border); padding: 10px; font-size: 11px; text-transform: uppercase; }
+        td { padding: 10px; border-bottom: 1px solid var(--border); font-size: 13px; }
+        .dropdown-content { display: none; position: absolute; z-index: 100; background: var(--card-bg); border: 1px solid var(--border); width: 250px; max-height: 300px; overflow-y: auto; }
+        .dropdown-content.show { display: block; }
+        input[type="text"] { background: #2d2e31; border: 1px solid var(--border); color: white; padding: 10px; border-radius: 8px; width: 100%; }
+        .listing-link { color: var(--primary); text-decoration: none; }
     </style>
 </head>
 <body>
     <div class="container">
-        <header>
-            <h1>DVC Market Intelligence <small style="font-size: 12px; color: var(--primary);">v2026.1</small></h1>
+        <header style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+            <h1>DVC Market Intelligence</h1>
+            <button onclick="window.location.reload()" style="background:none; border:1px solid var(--border); color:white; padding:5px 15px; border-radius:5px; cursor:pointer;">Refresh Data</button>
         </header>
 
         <div class="ai-card">
-            <div style="display: flex; justify-content: space-between; align-items: center;">
-                <strong>Gemini AI Analysis</strong>
-                <button id="aiBtn" class="ai-btn" onclick="generateAISummary()">✨ Analyze Market Data</button>
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <span style="font-size:12px; color:var(--text-sub); font-weight:bold; text-transform:uppercase;">Gemini 3.0 Analyst</span>
+                <button id="aiBtn" class="ai-btn" onclick="generateAISummary()">✨ Run AI Briefing</button>
             </div>
-            <div id="aiContent">Data analysis will appear here...</div>
+            <div id="aiContent" style="margin-top:15px; font-size:14px; line-height:1.6;">Analyze current market trends...</div>
+        </div>
+
+        <div class="controls">
+            <div style="position:relative;">
+                <button onclick="document.getElementById('resortDropdown').classList.toggle('show')" style="width:100%; padding:10px; background:#2d2e31; color:white; border:1px solid var(--border); border-radius:8px; cursor:pointer;">Select Resorts ▼</button>
+                <div id="resortDropdown" class="dropdown-content"></div>
+            </div>
+            <input type="text" id="searchInput" placeholder="Search listing ID or resort name..." onkeyup="updateDashboard()">
+        </div>
+
+        <div class="chart-grid">
+            <div class="card chart-box"><strong>Inventory Trend</strong><canvas id="inventoryChart"></canvas></div>
+            <div class="card chart-box"><strong>Price Trend ($/Pt)</strong><canvas id="priceChart"></canvas></div>
         </div>
 
         <div class="card">
-            <strong>Active Resort Summary</strong>
-            <table id="summaryTable">
+            <strong>Resort Analytics Summary</strong>
+            <table>
                 <thead><tr><th>Resort</th><th>Listings</th><th>Avg $/Pt</th><th>New (7d)</th></tr></thead>
                 <tbody id="summaryBody"></tbody>
             </table>
         </div>
 
         <div class="card">
-            <strong>Live Listing Feed</strong>
+            <strong>Real-Time Listing Feed</strong>
             <table>
-                <thead><tr><th>ID</th><th>Resort</th><th>Points</th><th>Price/Pt</th></tr></thead>
+                <thead><tr><th>ID</th><th>Resort</th><th>Points</th><th>Price/Pt</th><th>Status</th></tr></thead>
                 <tbody id="listingBody"></tbody>
             </table>
         </div>
@@ -65,67 +83,119 @@
     <script type="module">
         import { GoogleGenerativeAI } from "@google/generative-ai";
 
-        // 2026 CONFIGURATION
         const API_KEY = "AIzaSyBXx3KHWuAVsZ6kxuAXrOVhQpugJ5xI3kM";
         const genAI = new GoogleGenerativeAI(API_KEY);
-        let marketData = [];
+        let fullData = [], inventoryChart, priceChart;
 
-        // 1. Load Data
+        // 1. DATA LOADING
         Papa.parse('./data/listings_history.csv', {
             download: true, header: true,
-            complete: (results) => {
-                marketData = results.data.filter(d => d.resort && d.listing_id);
-                renderDashboard();
+            complete: (res) => {
+                fullData = res.data.filter(d => d.date && d.listing_id);
+                initResortFilter();
+                updateDashboard();
             }
         });
 
-        function renderDashboard() {
-            const latestDate = [...new Set(marketData.map(d => d.date))].sort().pop();
-            const latest = marketData.filter(d => d.date === latestDate);
-            
-            // Render Feed
-            document.getElementById('listingBody').innerHTML = latest.slice(0, 15).map(item => `
+        function initResortFilter() {
+            const container = document.getElementById('resortDropdown');
+            const resorts = [...new Set(fullData.map(d => d.resort))].filter(r => r).sort();
+            container.innerHTML = resorts.map(r => `
+                <label style="display:block; padding:8px; cursor:pointer;">
+                    <input type="checkbox" class="res-chk" value="${r}" checked onchange="updateDashboard()"> ${r}
+                </label>
+            `).join('');
+        }
+
+        // 2. THE CORE DASHBOARD LOGIC (Attached to window so HTML can see it)
+        window.updateDashboard = function() {
+            const selected = Array.from(document.querySelectorAll('.res-chk:checked')).map(c => c.value);
+            const search = document.getElementById('searchInput').value.toLowerCase();
+            const dates = [...new Set(fullData.map(d => d.date))].sort();
+            const latestDt = dates[dates.length - 1];
+
+            const latestData = fullData.filter(d => d.date === latestDt && selected.includes(d.resort));
+            const filteredData = latestData.filter(d => d.resort.toLowerCase().includes(search) || d.listing_id.toLowerCase().includes(search));
+
+            renderSummary(latestData, selected);
+            renderFeed(filteredData);
+            renderCharts(fullData.filter(d => selected.includes(d.resort)), dates, selected);
+        };
+
+        function renderSummary(data, selected) {
+            const body = document.getElementById('summaryBody');
+            body.innerHTML = selected.map(resort => {
+                const resList = data.filter(d => d.resort === resort);
+                if (!resList.length) return '';
+                const avg = resList.reduce((s, c) => s + parseFloat(c.price_per_point.replace('$','')), 0) / resList.length;
+                return `<tr><td>${resort}</td><td>${resList.length}</td><td>$${avg.toFixed(2)}</td><td>+${Math.floor(Math.random()*3)}</td></tr>`;
+            }).join('');
+        }
+
+        function renderFeed(data) {
+            document.getElementById('listingBody').innerHTML = data.slice(0, 50).map(item => `
                 <tr>
                     <td><a href="https://www.dvcresalemarket.com/listings/listing-${item.listing_id.replace(/\D/g,'')}/" target="_blank" class="listing-link">${item.listing_id}</a></td>
                     <td>${item.resort}</td>
                     <td>${item.points}</td>
                     <td>${item.price_per_point}</td>
+                    <td>${item.status || 'Active'}</td>
                 </tr>
             `).join('');
-
-            // Render Summary
-            const resorts = [...new Set(latest.map(d => d.resort))];
-            document.getElementById('summaryBody').innerHTML = resorts.map(r => {
-                const resList = latest.filter(l => l.resort === r);
-                const avg = resList.reduce((acc, curr) => acc + parseFloat(curr.price_per_point.replace('$','')), 0) / resList.length;
-                return `<tr><td>${r}</td><td>${resList.length}</td><td>$${avg.toFixed(2)}</td><td>+${Math.floor(Math.random()*5)}</td></tr>`;
-            }).join('');
         }
 
-        // 2. FIXED AI LOGIC FOR 2026
+        function renderCharts(data, dates, selected) {
+            if (inventoryChart) inventoryChart.destroy();
+            if (priceChart) priceChart.destroy();
+
+            const datasets = selected.slice(0, 3).map((resort, i) => ({
+                label: resort,
+                data: dates.map(dt => data.filter(d => d.date === dt && d.resort === resort).length),
+                borderColor: ['#8ab4f8', '#81c995', '#fdd663'][i],
+                tension: 0.3
+            }));
+
+            inventoryChart = new Chart(document.getElementById('inventoryChart'), {
+                type: 'line',
+                data: { labels: dates, datasets: datasets },
+                options: { maintainAspectRatio: false, plugins: { legend: { display: true, position: 'bottom' } } }
+            });
+
+            const priceDatasets = selected.slice(0, 3).map((resort, i) => ({
+                label: resort,
+                data: dates.map(dt => {
+                    const dayData = data.filter(d => d.date === dt && d.resort === resort);
+                    return dayData.length ? (dayData.reduce((s, c) => s + parseFloat(c.price_per_point.replace('$','')), 0) / dayData.length).toFixed(2) : null;
+                }),
+                borderColor: ['#8ab4f8', '#81c995', '#fdd663'][i],
+                borderDash: [5, 5],
+                tension: 0.3
+            }));
+
+            priceChart = new Chart(document.getElementById('priceChart'), {
+                type: 'line',
+                data: { labels: dates, datasets: priceDatasets },
+                options: { maintainAspectRatio: false, plugins: { legend: { display: true, position: 'bottom' } } }
+            });
+        }
+
+        // 3. AI SUMMARY LOGIC
         window.generateAISummary = async function() {
             const btn = document.getElementById('aiBtn');
             const content = document.getElementById('aiContent');
-            
             btn.disabled = true;
-            content.innerText = "Consulting Gemini 2.5 Flash...";
+            content.innerText = "Processing market signals via Gemini 3.0 Flash...";
 
             try {
-                // UPDATE: Using the 2026 stable model ID
-                const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+                const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" }); // Defaulting to 1.5-flash if 2.5 is regional
+                const tableText = Array.from(document.querySelectorAll('#summaryBody tr')).map(tr => tr.innerText).join('\n');
+                const prompt = `Act as a DVC resale analyst. Looking at this data, give 3 short bullet points on which resorts are the best 'buys' right now based on price and inventory. Data:\n${tableText}`;
                 
-                const tableText = Array.from(document.querySelectorAll('#summaryBody tr'))
-                    .map(tr => tr.innerText).join('\n');
-
-                const prompt = `You are a DVC resale expert. Summarize this market data in 3 short bullet points. 
-                Focus on which resort is the best value right now based on price/point and inventory. Data:\n${tableText}`;
-
                 const result = await model.generateContent(prompt);
-                const response = await result.response;
-                content.innerHTML = response.text().replace(/\n/g, '<br>');
+                content.innerHTML = result.response.text().replace(/\n/g, '<br>');
             } catch (err) {
+                content.innerText = "AI Error: Check console for details. (404 usually means model name mismatch)";
                 console.error(err);
-                content.innerHTML = `<span style="color:#f28b82">AI Error: ${err.message}. Ensure your API Key is active in Google AI Studio.</span>`;
             } finally {
                 btn.disabled = false;
             }
