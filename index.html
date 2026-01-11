@@ -23,46 +23,32 @@
         
         header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
         .controls { display: grid; grid-template-columns: 1fr 2fr; gap: 16px; margin-bottom: 24px; }
-        .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 24px; }
         
-        .card { background: var(--card-bg); padding: 20px; border-radius: 12px; box-shadow: var(--shadow); border: 1px solid var(--border); }
-        .metric { font-size: 32px; font-weight: 500; color: var(--primary); margin: 8px 0; }
-        .label { font-size: 12px; font-weight: 700; color: var(--text-sub); text-transform: uppercase; letter-spacing: 0.5px; }
+        .card { background: var(--card-bg); padding: 20px; border-radius: 12px; box-shadow: var(--shadow); border: 1px solid var(--border); margin-bottom: 20px; }
+        .label { font-size: 12px; font-weight: 700; color: var(--text-sub); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 10px; display: block; }
 
-        /* Enhanced Multi-select Dropdown */
+        .summary-table { width: 100%; border-collapse: collapse; }
+        .summary-table th { background: var(--hover); text-align: left; padding: 10px; font-size: 11px; color: var(--text-sub); }
+        .summary-table td { padding: 12px 10px; border-bottom: 1px solid var(--border); font-size: 13px; font-weight: 500; }
+
         .dropdown-container { position: relative; }
         .multiselect-btn { padding: 12px; border-radius: 8px; border: 1px solid var(--border); background: var(--card-bg); color: var(--text); cursor: pointer; display: flex; justify-content: space-between; }
         .dropdown-content { display: none; position: absolute; z-index: 100; width: 100%; background: var(--card-bg); border: 1px solid var(--border); border-radius: 8px; max-height: 400px; overflow-y: auto; margin-top: 4px; box-shadow: var(--shadow); }
         .dropdown-content.show { display: block; }
-
-        /* Bulk Selection Bar */
-        .bulk-actions { 
-            display: flex; gap: 10px; padding: 10px; 
-            border-bottom: 1px solid var(--border); 
-            position: sticky; top: 0; background: var(--card-bg);
-        }
-        .bulk-btn { 
-            flex: 1; padding: 6px; font-size: 11px; font-weight: bold; 
-            text-transform: uppercase; cursor: pointer; border-radius: 4px;
-            border: 1px solid var(--primary); background: transparent; color: var(--primary);
-        }
-        .bulk-btn:hover { background: var(--primary); color: white; }
-
+        .bulk-actions { display: flex; gap: 10px; padding: 10px; border-bottom: 1px solid var(--border); position: sticky; top: 0; background: var(--card-bg); }
+        .bulk-btn { flex: 1; padding: 6px; font-size: 11px; font-weight: bold; cursor: pointer; border-radius: 4px; border: 1px solid var(--primary); background: transparent; color: var(--primary); }
         .resort-option { display: block; padding: 10px 12px; cursor: pointer; font-size: 14px; }
-        .resort-option:hover { background: var(--hover); }
-        .resort-option input { margin-right: 10px; }
-
         input[type="text"] { padding: 12px; border-radius: 8px; border: 1px solid var(--border); background: var(--card-bg); color: var(--text); width: 100%; box-sizing: border-box; }
 
-        table { width: 100%; border-collapse: collapse; }
-        th { text-align: left; padding: 12px; font-size: 12px; color: var(--text-sub); border-bottom: 2px solid var(--border); cursor: pointer; }
-        td { padding: 16px 12px; border-bottom: 1px solid var(--border); font-size: 14px; }
+        .feed-table { width: 100%; border-collapse: collapse; }
+        .feed-table th { text-align: left; padding: 12px; font-size: 12px; color: var(--text-sub); border-bottom: 2px solid var(--border); cursor: pointer; }
+        .feed-table td { padding: 14px 12px; border-bottom: 1px solid var(--border); font-size: 14px; }
         tr:hover { background: var(--hover); }
 
-        .listing-link { color: var(--primary); text-decoration: none; font-weight: 500; }
-        .value-good { color: var(--success); font-weight: bold; }
-        .badge { padding: 4px 8px; border-radius: 6px; font-size: 11px; font-weight: 700; display: inline-block; }
-        .badge-deal { background: rgba(24, 128, 56, 0.15); color: var(--success); }
+        .trend-up { color: var(--warning); font-size: 11px; }
+        .trend-down { color: var(--success); font-size: 11px; }
+        .listing-link { color: var(--primary); text-decoration: none; font-weight: 600; }
+        .badge-new { background: rgba(26, 115, 232, 0.15); color: var(--primary); padding: 2px 6px; border-radius: 4px; font-size: 10px; }
     </style>
 </head>
 <body>
@@ -74,7 +60,7 @@
 
         <div class="controls">
             <div class="dropdown-container">
-                <div class="multiselect-btn" onclick="toggleDropdown()">
+                <div class="multiselect-btn" onclick="document.getElementById('resortDropdown').classList.toggle('show')">
                     <span id="selectedCount">All Resorts</span> <span>▼</span>
                 </div>
                 <div id="resortDropdown" class="dropdown-content">
@@ -88,19 +74,26 @@
             <input type="text" id="searchInput" placeholder="Search by ID, Resort, or Points..." onkeyup="updateDashboard()">
         </div>
 
-        <div class="grid">
-            <div class="card"><div class="label">Total Listings</div><div id="totalListings" class="metric">--</div></div>
-            <div class="card"><div class="label">Market Average</div><div id="avgPrice" class="metric">--</div></div>
-            <div class="card"><div class="label">Solds (24h)</div><div id="soldCount" class="metric">--</div></div>
+        <div class="card">
+            <span class="label">Resort Summary (Market Averages & Velocity)</span>
+            <table class="summary-table">
+                <thead>
+                    <tr>
+                        <th>Resort</th>
+                        <th># Contracts</th>
+                        <th>Avg Price / Pt</th>
+                        <th>Avg Days</th>
+                        <th>New (7d)</th>
+                        <th>Sold (7d)</th>
+                    </tr>
+                </thead>
+                <tbody id="summaryBody"></tbody>
+            </table>
         </div>
 
-        <div class="grid" style="grid-template-columns: 1fr 1fr; height: 350px;">
-            <div class="card"><canvas id="inventoryChart"></canvas></div>
-            <div class="card"><canvas id="priceTrendChart"></canvas></div>
-        </div>
-
-        <div class="card" style="margin-top: 24px;">
-            <table id="listingTable">
+        <div class="card">
+            <span class="label">Live Market Feed</span>
+            <table class="feed-table">
                 <thead>
                     <tr>
                         <th onclick="handleSort('listing_id')">ID</th>
@@ -108,7 +101,7 @@
                         <th onclick="handleSort('points')">Points</th>
                         <th onclick="handleSort('price_per_point')">Price/Pt</th>
                         <th onclick="handleSort('days')">Days</th>
-                        <th>Market Analysis</th>
+                        <th>Analysis</th>
                     </tr>
                 </thead>
                 <tbody id="listingBody"></tbody>
@@ -117,22 +110,16 @@
     </div>
 
     <script>
-        let fullData = [], inventoryChart, priceTrendChart;
+        let fullData = [];
         let currentSort = { col: 'price_per_point', dir: 'asc' };
         const slugs = {"Animal Kingdom": "animal-kingdom-lodge", "Aulani": "aulani-disney-resort", "Bay Lake Tower": "bay-lake-tower", "Beach Club": "beach-club-villas", "BoardWalk": "boardwalk-villas", "Boulder Ridge": "boulder-ridge-villas", "Copper Creek": "copper-creek-villas", "Grand Californian": "grand-californian", "Grand Floridian": "grand-floridian", "Hilton Head": "hilton-head", "Old Key West": "old-key-west", "Polynesian": "polynesian", "Riviera": "riviera-resort", "Saratoga Springs": "saratoga-springs", "Vero Beach": "vero-beach"};
 
         function toggleDropdown() { document.getElementById('resortDropdown').classList.toggle('show'); }
-
-        // Close dropdown when clicking outside
-        window.onclick = function(e) {
-            if (!e.target.closest('.dropdown-container')) {
-                document.getElementById('resortDropdown').classList.remove('show');
-            }
-        }
+        window.onclick = e => { if (!e.target.closest('.dropdown-container')) document.getElementById('resortDropdown').classList.remove('show'); }
 
         Papa.parse('./data/listings_history.csv', {
             download: true, header: true,
-            complete: function(res) {
+            complete: res => {
                 fullData = res.data.filter(d => d.date && d.listing_id);
                 initResorts();
                 updateDashboard();
@@ -163,70 +150,80 @@
             const search = document.getElementById('searchInput').value.toLowerCase();
             const dates = [...new Set(fullData.map(d => d.date))].sort();
             const latestDt = dates[dates.length - 1];
+            const prevDt = dates[dates.length - 2];
+            const weekAgoDt = dates[dates.length - 7] || dates[0];
 
-            document.getElementById('selectedCount').innerText = selected.length === 0 ? "No Resorts Selected" : `${selected.length} Resorts Selected`;
+            document.getElementById('selectedCount').innerText = `${selected.length} Resorts Selected`;
 
-            const resortAvgMap = {};
-            selected.forEach(r => {
-                const rData = fullData.filter(d => d.date === latestDt && d.resort === r);
-                resortAvgMap[r] = rData.reduce((s, d) => s + parseFloat(d.price_per_point.replace('$','')), 0) / (rData.length || 1);
-            });
-
-            const filtered = fullData.filter(d => selected.includes(d.resort));
-            const latest = filtered.filter(d => d.date === latestDt && (d.listing_id.toLowerCase().includes(search) || d.resort.toLowerCase().includes(search)));
-
-            document.getElementById('totalListings').innerText = latest.length;
-            const marketAvg = latest.reduce((s, d) => s + parseFloat(d.price_per_point.replace('$','')), 0) / (latest.length || 1);
-            document.getElementById('avgPrice').innerText = `$${marketAvg.toFixed(2)}`;
-
-            renderTable(latest, resortAvgMap);
-            renderCharts(filtered, dates, selected);
+            const latestData = fullData.filter(d => d.date === latestDt && selected.includes(d.resort));
+            const prevData = fullData.filter(d => d.date === prevDt && selected.includes(d.resort));
+            const weekAgoData = fullData.filter(d => d.date === weekAgoDt && selected.includes(d.resort));
+            
+            renderSummary(latestData, prevData, weekAgoData, selected);
+            
+            const filteredFeed = latestData.filter(d => d.listing_id.toLowerCase().includes(search) || d.resort.toLowerCase().includes(search));
+            renderFeed(filteredFeed);
         }
 
-        function renderTable(data, avgMap) {
+        function renderSummary(latest, prev, weekAgo, selectedResorts) {
+            const body = document.getElementById('summaryBody');
+            body.innerHTML = "";
+            
+            selectedResorts.sort().forEach(resort => {
+                const resLatest = latest.filter(d => d.resort === resort);
+                if (resLatest.length === 0) return;
+
+                // Price Metrics
+                const avgNow = resLatest.reduce((s, d) => s + parseFloat(d.price_per_point.replace('$','')), 0) / resLatest.length;
+                const resPrev = prev.filter(d => d.resort === resort);
+                const avgPrev = resPrev.length ? (resPrev.reduce((s, d) => s + parseFloat(d.price_per_point.replace('$','')), 0) / resPrev.length) : avgNow;
+                
+                let trend = "";
+                if (avgNow > avgPrev) trend = `<span class="trend-up">▲</span>`;
+                else if (avgNow < avgPrev) trend = `<span class="trend-down">▼</span>`;
+
+                // Velocity Metrics (7 Days)
+                const weekIDs = new Set(weekAgo.filter(d => d.resort === resort).map(d => d.listing_id));
+                const latestIDs = new Set(resLatest.map(d => d.listing_id));
+                
+                const newlyAdded = resLatest.filter(d => !weekIDs.has(d.listing_id)).length;
+                const newlySold = [...weekIDs].filter(id => !latestIDs.has(id)).length;
+
+                const avgDays = resLatest.reduce((s, d) => s + fullData.filter(h => h.listing_id === d.listing_id).length, 0) / resLatest.length;
+
+                body.innerHTML += `<tr>
+                    <td>${resort}</td>
+                    <td>${resLatest.length}</td>
+                    <td>$${avgNow.toFixed(2)} ${trend}</td>
+                    <td>${avgDays.toFixed(1)}</td>
+                    <td style="color:var(--primary)">+${newlyAdded}</td>
+                    <td style="color:var(--warning)">-${newlySold}</td>
+                </tr>`;
+            });
+        }
+
+        function renderFeed(data) {
             data.sort((a, b) => {
                 let vA = a[currentSort.col], vB = b[currentSort.col];
                 if (currentSort.col === 'price_per_point') { vA = parseFloat(a.price_per_point.replace('$','')); vB = parseFloat(b.price_per_point.replace('$','')); }
                 if (currentSort.col === 'points') { vA = parseInt(a.points); vB = parseInt(b.points); }
-                return currentSort.dir === 'asc' ? vA - vB : vB - vA;
+                return currentSort.dir === 'asc' ? (vA > vB ? 1 : -1) : (vA < vB ? 1 : -1);
             });
 
             const body = document.getElementById('listingBody');
             body.innerHTML = "";
             data.forEach(item => {
-                const price = parseFloat(item.price_per_point.replace('$',''));
-                const rAvg = avgMap[item.resort];
-                const pctDiff = ((price - rAvg) / rAvg) * 100;
-                
-                let analysis = (pctDiff < -5) ? `<span class="badge badge-deal">Great Value (${Math.abs(pctDiff).toFixed(1)}% below avg)</span>` : `<span style="color:var(--text-sub)">Fair Market</span>`;
-                const url = `https://www.dvcresalemarket.com/listings/${slugs[item.resort] || ''}/${item.listing_id.toLowerCase()}/`;
+                const days = fullData.filter(d => d.listing_id === item.listing_id).length;
+                const url = `https://www.dvcresalemarket.com/listings/${slugs[item.resort] || ''}/${item.listing_id.toLowerCase().trim()}/`;
                 
                 body.innerHTML += `<tr>
-                    <td style="color:var(--text-sub); font-family:monospace;">${item.listing_id}</td>
+                    <td style="font-family:monospace; color:var(--text-sub);">${item.listing_id}</td>
                     <td><a href="${url}" target="_blank" rel="noreferrer" class="listing-link">${item.resort}</a></td>
                     <td>${item.points}</td>
-                    <td class="${pctDiff < -5 ? 'value-good' : ''}">${item.price_per_point}</td>
-                    <td>${fullData.filter(d => d.listing_id === item.listing_id).length}</td>
-                    <td>${analysis}</td>
+                    <td>${item.price_per_point}</td>
+                    <td>${days}</td>
+                    <td>${days <= 2 ? '<span class="badge-new">RECENT</span>' : ''}</td>
                 </tr>`;
-            });
-        }
-
-        function renderCharts(data, dates, selected) {
-            if (inventoryChart) inventoryChart.destroy();
-            const ctx = document.getElementById('inventoryChart').getContext('2d');
-            inventoryChart = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: dates,
-                    datasets: selected.slice(0, 5).map((r, i) => ({
-                        label: r,
-                        data: dates.map(dt => data.filter(d => d.date === dt && d.resort === r).length),
-                        borderColor: ['#8ab4f8','#81c995','#fdd663','#f28b82','#c58af9'][i % 5],
-                        tension: 0.3, pointRadius: 0
-                    }))
-                },
-                options: { maintainAspectRatio: false, plugins: { title: { display: true, text: 'Resort Inventory Levels' } } }
             });
         }
     </script>
