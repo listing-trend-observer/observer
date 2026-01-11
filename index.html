@@ -33,6 +33,10 @@
         .summary-table th { text-align: left; color: var(--text-sub); border-bottom: 2px solid var(--border); padding: 10px; font-size: 11px; position: sticky; top: 0; background: var(--card-bg); }
         .summary-table td { padding: 12px 10px; border-bottom: 1px solid var(--border); font-size: 14px; font-weight: 500; }
 
+        /* NEW: Clickable Resort Style */
+        .clickable-resort { color: var(--primary); cursor: pointer; text-decoration: underline; text-decoration-style: dotted; }
+        .clickable-resort:hover { text-decoration-style: solid; }
+
         /* Side-by-Side Charts */
         .chart-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px; }
         .chart-box { height: 350px; }
@@ -83,7 +87,7 @@
         </div>
 
         <div class="card">
-            <span class="label">Resort Summary (Market Averages & 7-Day Velocity)</span>
+            <span class="label">Resort Summary (Market Averages & 7-Day Velocity) — Click Resort Name to Filter All Data</span>
             <div class="summary-wrapper">
                 <table class="summary-table">
                     <thead>
@@ -154,6 +158,14 @@
             });
         }
 
+        // NEW: Function to filter everything by clicking a summary name
+        function filterByResortName(name) {
+            document.querySelectorAll('.res-chk').forEach(cb => {
+                cb.checked = (cb.value === name);
+            });
+            updateDashboard();
+        }
+
         function bulkToggle(checkAll) {
             document.querySelectorAll('.res-chk').forEach(cb => cb.checked = checkAll);
             updateDashboard();
@@ -198,7 +210,6 @@
                 const avgPrev = resPrev.length ? (resPrev.reduce((s, d) => s + parseFloat(d.price_per_point.replace('$','')), 0) / resPrev.length) : avgNow;
                 
                 let trend = avgNow > avgPrev ? '<span class="trend-up">▲</span>' : (avgNow < avgPrev ? '<span class="trend-down">▼</span>' : '');
-
                 const weekIDs = new Set(weekAgo.filter(d => d.resort === resort).map(d => d.listing_id));
                 const latestIDs = new Set(resLatest.map(d => d.listing_id));
                 const newlyAdded = resLatest.filter(d => !weekIDs.has(d.listing_id)).length;
@@ -206,9 +217,12 @@
                 const avgDays = resLatest.reduce((s, d) => s + fullData.filter(h => h.listing_id === d.listing_id).length, 0) / resLatest.length;
 
                 body.innerHTML += `<tr>
-                    <td>${resort}</td><td>${resLatest.length}</td>
-                    <td>$${avgNow.toFixed(2)} ${trend}</td><td>${avgDays.toFixed(1)}</td>
-                    <td style="color:var(--primary)">+${newlyAdded}</td><td style="color:var(--warning)">-${newlySold}</td>
+                    <td class="clickable-resort" onclick="filterByResortName('${resort}')">${resort}</td>
+                    <td>${resLatest.length}</td>
+                    <td>$${avgNow.toFixed(2)} ${trend}</td>
+                    <td>${avgDays.toFixed(1)}</td>
+                    <td style="color:var(--primary)">+${newlyAdded}</td>
+                    <td style="color:var(--warning)">-${newlySold}</td>
                 </tr>`;
             });
         }
@@ -217,11 +231,11 @@
             if (inventoryChart) inventoryChart.destroy();
             if (priceTrendChart) priceTrendChart.destroy();
             const colors = ['#8ab4f8','#81c995','#fdd663','#f28b82','#c58af9'];
-            const commonOpt = { maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { display: true }, y: { ticks: { font: { size: 9 } } } } };
+            const commonOpt = { maintainAspectRatio: false, plugins: { legend: { display: selected.length === 1 } }, scales: { x: { display: true }, y: { ticks: { font: { size: 9 } } } } };
 
             inventoryChart = new Chart(document.getElementById('inventoryChart'), {
                 type: 'line',
-                data: { labels: dates, datasets: selected.slice(0,5).map((r, i) => ({ label: r, data: dates.map(dt => data.filter(d => d.date === dt && d.resort === r).length), borderColor: colors[i % 5], tension: 0.3, pointRadius: 0 })) },
+                data: { labels: dates, datasets: selected.slice(0,5).map((r, i) => ({ label: r, data: dates.map(dt => data.filter(d => d.date === dt && d.resort === r).length), borderColor: colors[i % 5], tension: 0.3, pointRadius: 2 })) },
                 options: commonOpt
             });
 
@@ -230,7 +244,7 @@
                 data: { labels: dates, datasets: selected.slice(0,5).map((r, i) => ({ label: r, data: dates.map(dt => {
                     const day = data.filter(d => d.date === dt && d.resort === r);
                     return day.length ? (day.reduce((s, d) => s + parseFloat(d.price_per_point.replace('$','')), 0) / day.length).toFixed(2) : null;
-                }), borderColor: colors[i % 5], borderDash: [5, 5], tension: 0.3, pointRadius: 2 })) },
+                }), borderColor: colors[i % 5], borderDash: [5, 5], tension: 0.3, pointRadius: 4 })) },
                 options: commonOpt
             });
         }
